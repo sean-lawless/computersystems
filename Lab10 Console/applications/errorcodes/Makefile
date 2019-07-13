@@ -9,7 +9,6 @@
 ##
 CP	= cp
 RM	= rm
-LN	= ln
 C	= arm-none-eabi-gcc
 CC	= arm-none-eabi-gcc
 CPP	= arm-none-eabi-gcc
@@ -50,13 +49,13 @@ INCLUDES = -I. -I../../include -I../../boards/rpi \
            -I../../boards/peripherals
 
 ##
-## Console application
+## Error code application
 ##
-ERRORCODES = ../../boards/rpi/app.o \
-             ../../boards/rpi/board.o \
-             ../../system/os.o \
-             main.o \
-
+OBJECTS = ../../boards/rpi/app.o \
+          ../../boards/rpi/board.o \
+          ../../system/os.o \
+          ../../system/string.o \
+          main.o \
 
 LIBS =
 
@@ -78,13 +77,13 @@ LIBS =
 
 all:	app
 
-app:	$(ERRORCODES)
-	$(LINK) -T ../../boards/rpi/memory.map -o $(APPNAME).elf $(ERRORCODES) $(LIBS)
+app:	$(OBJECTS)
+	$(LINK) -T ../../boards/rpi/memory.map -o $(APPNAME).elf $(OBJECTS) $(LIBS)
 	$(PLINK) $(APPNAME).elf -O binary $(APPNAME).bin
 	$(CP) $(APPNAME).bin kernel7.img
 
 clean:
-	rm -f $(ERRORCODES)
+	rm -f $(OBJECTS)
 	rm -f *.bin
 	rm -f *.elf
 	rm -f *.img

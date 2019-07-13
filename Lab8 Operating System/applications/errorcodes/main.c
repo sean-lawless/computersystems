@@ -57,9 +57,9 @@ int main(void)
     for (i = 0; i < tmp; ++i)
     {
       LedOn();
-      usleep(T1_MICROSECOND / 4);
+      usleep(MICROS_PER_SECOND / 4);
       LedOff();
-      usleep(T1_MICROSECOND / 4);
+      usleep(MICROS_PER_SECOND / 4);
     }
 
     /* Sleep one second in between nibbles. */
@@ -70,9 +70,9 @@ int main(void)
     for (i = 0; i < tmp; ++i)
     {
       LedOn();
-      usleep(T1_MICROSECOND / 4);
+      usleep(MICROS_PER_SECOND / 4);
       LedOff();
-      usleep(T1_MICROSECOND / 4);
+      usleep(MICROS_PER_SECOND / 4);
     }
 
     /* Sleep three seconds and then repeat the error code. */
@@ -80,4 +80,5 @@ int main(void)
   }
   return 0;
 }
+
 

@@ -45,7 +45,7 @@
 /*...................................................................*/
 /* Configuration                                                     */
 /*...................................................................*/
-#define USE_HIGHER_PRIORITY     TRUE /* true to increase priority  */
+#define USE_DYNAMIC_PRIORITY    TRUE /* true to increase priority  */
                                      /* until a task is available. */
 
 /*...................................................................*/
@@ -75,8 +75,8 @@ int TaskNew(int priority, int (*poll) (void *data), void *data)
     return -1;
   }
 
-#if USE_HIGHER_PRIORITY
-  /* Increase priority until a task is available */
+#if USE_DYNAMIC_PRIORITY
+  /* Increase (lower) priority until a task is available */
   /* if poll is NULL but data valid the task is disabled so skip */
   while ((Tasks[priority].poll != NULL) &&
          (Tasks[priority].data != NULL))

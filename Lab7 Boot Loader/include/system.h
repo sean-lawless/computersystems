@@ -53,7 +53,7 @@
 ** Time definitions
 */
 #define MICROS_PER_SECOND      1000000 /* Microseconds per second */
-#define MICROS_PER_MILLISECOND 1000    /* Microseconds per millisecond */
+#define MICROS_PER_MILLISECOND 1000  /* Microseconds per millisecond */
 
 /*...................................................................*/
 /* Macro Definitions                                                 */
@@ -135,7 +135,7 @@ int memcmp(const void *data1, const void *data2, int length);
 /*
  * Boot Loader interface
 */
-int XmodemDownload(unsigned char *destination, int length);
+int XmodemDownload(u8 *destination, int length);
 
 
 #endif /* _SYSTEM_H */

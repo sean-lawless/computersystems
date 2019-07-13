@@ -46,3 +46,4 @@ int puts(const char *string);
 u8 putbyte(u8 byte);
 #define putu32(val) { putbyte(val >> 24); putbyte(val >> 16); \
                       putbyte(val >> 8); putbyte(val); }
+

@@ -52,7 +52,6 @@
 /* Symbol Definitions                                                */
 /*...................................................................*/
 #define T1_CLOCK_SECOND  MICROS_PER_SECOND /* RPi is microseconds */
-#define MAX_TIMER_TASKS 20
 
 /*...................................................................*/
 /* Global Variables                                                  */
@@ -174,13 +173,14 @@ void BoardInit(void)
   Uart0State.puts("Computer Systems");
   Uart0State.puts("  Using priority loop scheduler");
   Uart0State.puts("Copyright 2015-2019 Sean Lawless.");
-  Uart0State.puts("  All rights reserved\n");
+  Uart0State.puts("  All rights reserved.\n");
   Uart0State.puts("Connected to primary UART interface.");
   Uart0State.puts("'?' for a list of commands");
 #else
   /* display the introductory splash */
   Uart0Puts("Computer Systems");
-  Uart0Puts("\tCopyright 2015-2019 Sean Lawless, All rights reserved\n");
+  Uart0Puts("\tCopyright 2015-2019 Sean Lawless.");
+  Uart0State.puts("  All rights reserved.\n");
   Uart0Puts("Connected to primary UART interface.");
   Uart0Puts("'?' for a list of commands");
 #endif
@@ -459,12 +459,11 @@ u64 TimerNow(void)
 void usleep(u64 microseconds)
 {
   struct timer tw;
-  u64 now = 1;
 
   /* Create a timer that expires 'microseconds' from now. */
   tw = TimerRegister(microseconds);
 
   /* Loop checking the timer until it expires. */
-  for (;now > 0;)
-    now = TimerRemaining(&tw);
+  for (;TimerRemaining(&tw) > 0;)
+    ; // Do nothing
 }

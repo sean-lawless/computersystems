@@ -59,7 +59,7 @@
 ** Time definitions
 */
 #define MICROS_PER_SECOND      1000000 /* Microseconds per second */
-#define MICROS_PER_MILLISECOND 1000    /* Microseconds per millisecond */
+#define MICROS_PER_MILLISECOND 1000  /* Microseconds per millisecond */
 
 /*
 ** Polled task return values
@@ -107,17 +107,17 @@ struct timer
 /*
  * Task structures
 */
-typedef struct
+struct ShellCmd
 {
   char *command;
   int (*function)(const char *command);
-} ShellCmd;
+};
 
 struct task
 {
   int (*poll) (void *data);
   void *data;
-} Task;
+};
 
 /*
  * State structures
@@ -131,7 +131,7 @@ struct led_state
 struct shell_state
 {
   u8 command[COMMAND_LENGTH], i;
-  ShellCmd *cmd;
+  struct ShellCmd *cmd;
   void *param;
   int result;
   char (*getc)(void);
@@ -167,8 +167,8 @@ void Uart1Init(void);
 /*
  * Xmodem interface
 */
-void *XmodemStart(unsigned char *destination, int length);
-int XmodemDownload(unsigned char *destination, int length);
+void *XmodemStart(u8 *destination, int length);
+int XmodemDownload(u8 *destination, int length);
 int XmodemPoll(void *data);
 
 /*

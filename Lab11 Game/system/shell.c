@@ -45,14 +45,13 @@
 
 #if ENABLE_SHELL
 
+#define MAX_SHELL_COMMANDS     24
+
 /*
 ** Shell Functions
 */
 #if ENABLE_XMODEM
 static int xmodem(const char *command);
-#endif
-#if ENABLE_VIDEO
-extern int ClearDisplay(const char *command);
 #endif
 static int echo(const char *command);
 static int run(const char *command);
@@ -62,20 +61,20 @@ static int rboot(const char *command);
 /*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
-static ShellCmd ShellCommands[24];
+static struct ShellCmd ShellCommands[MAX_SHELL_COMMANDS];
 struct shell_state Uart0State, Uart1State, ConsoleState;
 
 /*...................................................................*/
 /* Local function definitions                                        */
 /*...................................................................*/
 
-/*..................................................................*/
-/*   rboot: Reboot the hardware system (hardware reboot)            */
-/*                                                                  */
-/*   input: command = the entire command                            */
-/*                                                                  */
-/*  return: TASK_FINISHED                                           */
-/*..................................................................*/
+/*...................................................................*/
+/*   rboot: Reboot the hardware system (hardware reboot)             */
+/*                                                                   */
+/*   input: command = the entire command                             */
+/*                                                                   */
+/*  return: TASK_FINISHED                                            */
+/*...................................................................*/
 static int rboot(const char *command)
 {
   SystemReboot();
@@ -110,13 +109,13 @@ static int screen_on(const char *command)
 
 }
 
-/*..................................................................*/
-/* screen_clear: Clear the screen (ie all pixels black)             */
-/*                                                                  */
-/*   input: command = the entire command                            */
-/*                                                                  */
-/*  return: TASK_FINISHED                                           */
-/*..................................................................*/
+/*...................................................................*/
+/* screen_clear: Clear the screen (ie all pixels black)              */
+/*                                                                   */
+/*   input: command = the entire command                             */
+/*                                                                   */
+/*  return: TASK_FINISHED                                            */
+/*...................................................................*/
 static int screen_clear(const char *command)
 {
   if (ScreenUp)
@@ -131,17 +130,39 @@ static int screen_clear(const char *command)
 }
 #endif
 
-/*..................................................................*/
-/*    echo: Echo a string to all consoles                           */
-/*                                                                  */
-/*   input: command = the entire command                            */
-/*                                                                  */
-/*  return: TASK_FINISHED                                           */
-/*..................................................................*/
+/*...................................................................*/
+/*    echo: Echo a string to all consoles                            */
+/*                                                                   */
+/*   input: command = the entire command                             */
+/*                                                                   */
+/*  return: TASK_FINISHED                                            */
+/*...................................................................*/
 static int echo(const char *command)
 {
   /* Echo the command to all consoles. */
-  puts(command);
+#if ENABLE_UART0
+#if ENABLE_SHELL
+  /* Display on UART0. */
+  if (Uart0State.puts)
+    Uart0State.puts(command);
+  else
+#endif
+    Uart0Puts(command);
+#endif
+#if ENABLE_UART1
+#if ENABLE_SHELL
+  /* Display on UART1. */
+  if (Uart1State.puts)
+    Uart1State.puts(command);
+  else
+#endif
+    Uart1Puts(command);
+#endif
+#if ENABLE_VIDEO
+  /* Display on video screen. */
+  if (ScreenUp)
+    ConsoleState.puts(command);
+#endif
   return TASK_FINISHED;
 }
 
@@ -229,7 +250,7 @@ static int xmodem(const char *command)
 /*                                                                   */
 /*      Return: pointer to command function                          */
 /*...................................................................*/
-static ShellCmd *shell(const char *command)
+static struct ShellCmd *shell(const char *command)
 {
   int i;
 
@@ -332,7 +353,7 @@ int ShellPoll(void *data)
     if ((state->cmd->function == run) ||
         (state->cmd->function == quit))
     {
-      ShellCmd *temp = state->cmd;
+      struct ShellCmd *temp = state->cmd;
 
       /* Clear the shell command so ShellPoll is reentrant. */
       state->i = 0;
@@ -405,7 +426,7 @@ int ShellPoll(void *data)
       state->putc('\n');
       if (state->i == 0)
         state->putc('\r');
-  
+
       if ((state->i <= 1) && (state->command[0] == '?'))
       {
         int i;

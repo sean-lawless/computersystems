@@ -6,7 +6,7 @@
 /*                                                                   */
 /*...................................................................*/
 /*                                                                   */
-/*                   Copyright 2015, Sean Lawless                    */
+/*                   Copyright 2015-2019, Sean Lawless               */
 /*                                                                   */
 /*                      ALL RIGHTS RESERVED                          */
 /*                                                                   */
@@ -206,7 +206,7 @@ void Uart0Puts(const char *string)
 /*...................................................................*/
 void Uart0Putc(char character)
 {
-  unsigned int status;
+  u32 status;
 
   /* Read the UART status. */
   status = REG32(UART_STATUS);

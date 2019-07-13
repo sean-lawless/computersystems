@@ -338,12 +338,11 @@ u64 TimerNow(void)
 void usleep(u64 microseconds)
 {
   struct timer tw;
-  u64 now = 1;
 
   /* Create a timer that expires 'microseconds' from now. */
   tw = TimerRegister(microseconds);
 
   /* Loop checking the timer until it expires. */
-  for (;now > 0;)
-    now = TimerRemaining(&tw);
+  for (;TimerRemaining(&tw) > 0;)
+    ; // Do nothing
 }

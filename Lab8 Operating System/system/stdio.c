@@ -1,6 +1,6 @@
 /*...................................................................*/
 /*                                                                   */
-/*   Module:  stdio.h                                                */
+/*   Module:  stdio.c                                                */
 /*   Version: 2015.0                                                 */
 /*   Purpose: Standard I/O implementation                            */
 /*                                                                   */
@@ -36,7 +36,6 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /*...................................................................*/
 #include <system.h>
-#include <board.h>
 #include <stdio.h>
 
 #if ENABLE_OS

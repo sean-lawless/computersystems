@@ -181,7 +181,7 @@ void Uart0Puts(const char *string)
 /*...................................................................*/
 void Uart0Putc(char character)
 {
-  unsigned int status;
+  u32 status;
 
   /* Read the UART status. */
   status = REG32(UART_STATUS);

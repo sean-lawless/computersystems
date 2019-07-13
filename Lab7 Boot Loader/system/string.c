@@ -2,7 +2,7 @@
 /*                                                                   */
 /*   Module:  string.c                                               */
 /*   Version: 2015.0                                                 */
-/*   Purpose: String routines for implementing <string.h>            */
+/*   Purpose: String routines                                        */
 /*                                                                   */
 /*...................................................................*/
 /*                                                                   */
@@ -53,6 +53,7 @@ int strlen(const char *string)
 {
   int length;
 
+  // Count all bytes until the NULL (0) byte
   for (length = 0; string[length]; ++length) ;
 
   return length;
@@ -71,18 +72,18 @@ int memcmp(const void *data1, const void *data2, int length)
 {
   int i;
 
+  // Compare each byte and break if not equal.
   for (i = 0; i < length; ++i)
-  {
-    if (((unsigned char *)data1)[i] != ((unsigned char *)data2)[i])
+    if (((u8 *)data1)[i] != ((u8 *)data2)[i])
       break;
-  }
 
+  // Return zero if equal, or index of unequal byte
   if (i == length)
     return 0;
-  else if (((unsigned char *)data1)[i] > ((unsigned char *)data1)[i])
-    return i + 1;
+  else if (((u8 *)data1)[i] > ((u8 *)data1)[i])
+    return i + 1; // Positive index if greater than
   else
-    return -(i + 1);
+    return -(i + 1); // Negative index if less than
 }
 
 /*...................................................................*/
@@ -96,23 +97,44 @@ int memcmp(const void *data1, const void *data2, int length)
 /*...................................................................*/
 void *memcpy(void *dst, const void *src, int length)
 {
-  int i;
-  unsigned char *destination = dst;
-  const unsigned char *source = src;
-  unsigned int *dest32 = dst;
-  const unsigned int *src32 = src;
+  int i, bytes;
+  u8 *destination = dst;
+  const u8 *source = src;
 
-  if ((((unsigned int)dst & 3) == 0) && (((unsigned int)src & 3) == 0))
+  // Loop until all bytes are copied
+  for (bytes = 0; bytes < length; ++bytes)
   {
-    for (i = 0; i < length / 4; ++i)
-      dest32[i] = src32[i];
-    for (i = 0; i < length % 4; ++i)
-      destination[i] = source[i];
-  }
-  else
-  {
-    for (i = 0; i < length; ++i)
-      destination[i] = source[i];
+    // If 64 bits remaining and aligned, copy 64 bytes at a time
+    if ((length - bytes > 7) &&
+        (((uintptr_t)&destination[bytes] & 7) == 0) &&
+        (((uintptr_t)&source[bytes] & 7) == 0))
+    {
+      u64 *dest64 = (u64 *)&destination[bytes];
+      const u64 *src64 = (u64 *)&source[bytes];
+
+      for (i = 0; i < (length - bytes) / 8; ++i)
+        dest64[i] = src64[i];
+
+      bytes += i * 8 - 1;
+    }
+
+    // If 32 bits remaining and aligned, copy 32 bytes at a time
+    if ((length - bytes > 3) &&
+        (((uintptr_t)&destination[bytes] & 3) == 0) &&
+        (((uintptr_t)&source[bytes] & 3) == 0))
+    {
+      u32 *dest32 = (u32 *)&destination[bytes];
+      const u32 *src32 = (u32 *)&source[bytes];
+
+      for (i = 0; i < (length - bytes) / 4; ++i)
+        dest32[i] = src32[i];
+
+      bytes += i * 4 - 1;
+    }
+
+    // Otherwise copy one byte
+    else
+      destination[bytes] = source[bytes];
   }
   return dst;
 }

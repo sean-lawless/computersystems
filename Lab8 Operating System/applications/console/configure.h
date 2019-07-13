@@ -41,7 +41,7 @@
 /*...................................................................*/
 /* Configuration                                                     */
 /*...................................................................*/
-#define ENABLE_OS          FALSE
+#define ENABLE_OS          TRUE
 #define   MAX_TASKS          (10 + ENABLE_UART0 + ENABLE_UART1)
 #define ENABLE_SHELL       TRUE
 #define ENABLE_UART0       TRUE  /* enable primary UART */

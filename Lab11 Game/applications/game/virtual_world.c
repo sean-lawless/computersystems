@@ -365,7 +365,8 @@ static int world_create_random(World *world, u32 flags)
           random = TERRAIN_WATER;
           color = COLOR_DEEPSKYBLUE;
       }
-      else if ((flags & WORLD_SOUTH_COAST) && (y >= GAME_GRID_HEIGHT - 2))
+      else if ((flags & WORLD_SOUTH_COAST) &&
+               (y >= GAME_GRID_HEIGHT - 2))
       {
           random = TERRAIN_WATER;
           color = COLOR_DEEPSKYBLUE;
@@ -375,14 +376,15 @@ static int world_create_random(World *world, u32 flags)
           random = TERRAIN_WATER;
           color = COLOR_DEEPSKYBLUE;
       }
-      else if ((flags & WORLD_EAST_COAST) && (x >= GAME_GRID_WIDTH - 2))
+      else if ((flags & WORLD_EAST_COAST) &&
+               (x >= GAME_GRID_WIDTH - 2))
       {
           random = TERRAIN_WATER;
           color = COLOR_DEEPSKYBLUE;
       }
       else
       {
-        random = (((random & 0xF) ^ ((random & 0xF0) >> 8)) & 0xF) + 90;
+        random = (((random & 0xF) ^ ((random & 0xF0) >> 8)) & 0xF) +90;
         if (random > 94)
         {
           if (random == 95)
@@ -432,14 +434,17 @@ static int world_create_random(World *world, u32 flags)
 
         if (y > 0)
         {
-          aboveTile = middleEarth[x + (y - 1) * GAME_GRID_WIDTH].tile.tileNum;
+          aboveTile = middleEarth[x + (y - 1) *
+                                         GAME_GRID_WIDTH].tile.tileNum;
           if (x > 0)
-            aboveTileLeft = middleEarth[(x - 1) + (y - 1) * GAME_GRID_WIDTH].tile.tileNum;
+            aboveTileLeft = middleEarth[(x - 1) + (y - 1) *
+                                         GAME_GRID_WIDTH].tile.tileNum;
           else
             aboveTileLeft = 0;
 
           if (x < GAME_GRID_WIDTH - 1)
-            aboveTileRight = middleEarth[(x + 1) + (y - 1) * GAME_GRID_WIDTH].tile.tileNum;
+            aboveTileRight = middleEarth[(x + 1) + (y - 1) *
+                                         GAME_GRID_WIDTH].tile.tileNum;
           else
             aboveTileRight = 0;
 
@@ -742,23 +747,6 @@ static void creature_attack(SpriteTile *creatureTile,
   // Roll virtual dice (sample PRNG)
   int d20roll, modifier = 0;
 
-  // If attacking creature not yet visible, display it now
-  if (!(creatureTile->tile.flags & IS_VISIBLE))
-  {
-    BackgroundTile *theTerrain;
-
-    creatureTile->tile.flags |= IS_VISIBLE;
-    theTerrain = creatureTile->currentWorld->tiles;
-    theTerrain = &theTerrain[creatureTile->locationX +
-                        (creatureTile->locationY * GAME_GRID_WIDTH)];
-
-    // Only display creature if player character has tile visibility
-    if (theTerrain->tile.flags & IS_VISIBLE)
-      SpriteTileDisplay(GAME_GRID_START_X +(creatureTile->locationX * 16),
-                        GAME_GRID_START_Y +(creatureTile->locationY * 16),
-                    creatureTile->tile.color, creatureTile->tile.tileNum);
-  }
-
   // Simulate 20 side dice roll with 8 bits worth or randomness
   d20roll = (rand() % 31);
   if (d20roll == 0)
@@ -782,6 +770,23 @@ static void creature_attack(SpriteTile *creatureTile,
     // Use second roll if higher
     if (roll > d20roll)
       d20roll = roll;
+  }
+
+  // If attacking creature not yet visible, display it now
+  if (!(creatureTile->tile.flags & IS_VISIBLE))
+  {
+    BackgroundTile *theTerrain;
+
+    creatureTile->tile.flags |= IS_VISIBLE;
+    theTerrain = creatureTile->currentWorld->tiles;
+    theTerrain = &theTerrain[creatureTile->locationX +
+                        (creatureTile->locationY * GAME_GRID_WIDTH)];
+
+    // Only display creature if player character has tile visibility
+    if (theTerrain->tile.flags & IS_VISIBLE)
+      SpriteTileDisplay(GAME_GRID_START_X +(creatureTile->locationX * 16),
+                        GAME_GRID_START_Y +(creatureTile->locationY * 16),
+                    creatureTile->tile.color, creatureTile->tile.tileNum);
   }
 
   // Apply dexterity modifier if ranged attack
@@ -1062,7 +1067,7 @@ static void sprite_move_random(SpriteTile *creatureTile)
 
   // Generate randX and randY bits, zero or one
   random = rand();
-  randX = ((random & 0x0F) >= 8) ? 1 : 0;
+  randX = ((random & 0x0F) < 8) ? 1 : 0;
   if (random < 0)
     randX = -randX;
 
@@ -1670,9 +1675,9 @@ static void game_level_up(PlayerTile *characterTile)
 /*...................................................................*/
 /* player_move: Move the player sprite to a new game grid location   */
 /*                                                                   */
-/*   Input: unused is an unused parameter                            */
-/*          character is void pointer to PlayerTile                  */
-/*          creatures is void pointer to array of CreatureTile's     */
+/*   Input: characteTiler is pointer to PlayerTile                   */
+/*          tileX is the players new tile X position                 */
+/*          tileY is the players new tile Y position                 */
 /*                                                                   */
 /*  Return: Zero (0) on success, -1 on failure                       */
 /*...................................................................*/
@@ -1797,7 +1802,8 @@ static int player_move(PlayerTile *characterTile, int tileX, int tileY)
               characterTile->player.stats.str = 18;
           }
 
-          if (!(characterTile->player.stats.flags & CLASS_CLERIC))
+          if (!(characterTile->player.stats.flags &
+                                        (CLASS_CLERIC | CLASS_WIZARD)))
           {
             if (theTerrain->item->tile.tileNum == ITEM_WEAPON_BOW)
             {

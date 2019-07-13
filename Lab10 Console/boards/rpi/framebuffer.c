@@ -45,7 +45,7 @@
 #define MAX_FRAMES 1
 
 // Thanks to the following sources.
-// 
+//
 // github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
 // www.abbeycat.info/2017/03/06/the-raspberry-pis-vidiocore-iv/
 //
@@ -54,8 +54,8 @@ typedef struct VideoCoreFrameBuffer
 {
   u32 width;      // Physical width of display in pixel
   u32 height;     // Physical height of display in pixel
-  u32 virtWidth;  // always as physical width so far
-  u32 virtHeight; // always as physical height so far
+  u32 virtWidth;  // same as physical width
+  u32 virtHeight; // same as physical height
   u32 depth;      // Number of bits per pixel (bpp)
   u32 bufferAddr; // Address of frame buffer
   u32 bufferSize; // Size of frame buffer
@@ -70,7 +70,7 @@ typedef struct
 Frame Frames[MAX_FRAMES];
 
 int FrameIndex = 0;
-extern int FrameBufferIndex;
+int FrameBufferIndex;
 
 /*...................................................................*/
 /* FrameBufferInit: Initialize the frame buffer interface            */

@@ -38,9 +38,9 @@
 #ifndef _STRING_H
 #define _STRING_H
 
-/***********************************************************************/
-/* Global Function Definitions                                         */
-/***********************************************************************/
+/*...................................................................*/
+/* Global Function Definitions                                       */
+/*...................................................................*/
 extern void *memcpy(void *dst, const void *src, size_t length);
 extern void *memset(void *dst, int value, size_t length);
 extern int memcmp(const void *data1, const void *data2, size_t length);
@@ -55,8 +55,8 @@ extern size_t strlen(const char *string);
 extern int strnlen(const char *string, int length);
 extern size_t strcat(char *dst, const char *add);
 #define strcpy(dst, src) memcpy(dst, src, strlen(src) + 1)
-#define strncpy(dst, src, len) memcpy(dst, src, min(strlen(src) + 1, len))
-#define strlcpy(dst, src, len) memcpy(dst, src, min(strlen(src) + 1, len))
+#define strncpy(dst, src, len) memcpy(dst, src, min(strlen(src)+1, len))
+#define strlcpy(dst, src, len) memcpy(dst, src, min(strlen(src)+1, len))
 #define memscan(ptr, val, num) memchr(ptr, val, num)
 
 #endif /* _STRING_H */

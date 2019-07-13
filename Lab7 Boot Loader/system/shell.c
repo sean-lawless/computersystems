@@ -49,11 +49,11 @@
 /*...................................................................*/
 /* Type definitions                                                  */
 /*...................................................................*/
-typedef struct
+struct ShellCmd
 {
   char *command;
   int (*function)(const char *command);
-} ShellCmd;
+};
 
 /*
 ** Shell Functions
@@ -69,7 +69,7 @@ static int quit(const char *command);
 /*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
-static ShellCmd ShellCommands[] =
+static struct ShellCmd ShellCommands[] =
 {
   {"echo", echo},
   {"ledon", led},
@@ -259,7 +259,7 @@ void SystemShell(void)
   for (;;)
   {
     /* Output a different shell prompt for bootloader and console. */
-#if ENABLE_BOOT
+#if ENABLE_BOOTLOADER
     putchar('b');
     putchar('o');
     putchar('o');

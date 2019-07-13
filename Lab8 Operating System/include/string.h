@@ -38,9 +38,9 @@
 #ifndef _STRING_H
 #define _STRING_H
 
-/***********************************************************************/
-/* Global Function Definitions                                         */
-/***********************************************************************/
+/*...................................................................*/
+/* Global Function Definitions                                       */
+/*...................................................................*/
 extern void *memcpy(void *dst, const void *src, int length);
 extern void *memset(void *dst, int value, int length);
 extern int memcmp(const void *data1, const void *data2, int length);

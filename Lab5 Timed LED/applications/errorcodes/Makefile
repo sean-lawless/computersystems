@@ -9,7 +9,6 @@
 ##
 CP	= cp
 RM	= rm
-LN	= ln
 C	= arm-none-eabi-gcc
 CC	= arm-none-eabi-gcc
 CPP	= arm-none-eabi-gcc
@@ -35,9 +34,9 @@ EXTRAS = -DRPI=3 -ffreestanding
 # End Historic/Depricated/Older GCC
 
 ##Warnings about everything and optimize for size or speed (-Os or -O2)
-#CFLAGS = -Wall -O2 $(EXTRAS)
+CFLAGS = -Wall -O2 $(EXTRAS)
 ##Warnings and debugging build, with GDB and no optimizations (-O0)
-CFLAGS = -Wall -ggdb -O0 $(EXTRAS)
+#CFLAGS = -Wall -ggdb -O0 $(EXTRAS)
 
 ASFLAGS =
 ##RPI 3

@@ -2,7 +2,7 @@
 /*                                                                   */
 /*   Module:  game_grid.c                                            */
 /*   Version: 2019.0                                                 */
-/*   Purpose: 2D game graid engine logic                             */
+/*   Purpose: 2D game grid engine logic                              */
 /*                                                                   */
 /*...................................................................*/
 /*                                                                   */
@@ -50,8 +50,6 @@
 /*   Input: background is pointer to game grid background tile       */
 /*          locationX indicate the X (width) game grid position      */
 /*          locationY indicate the Y (height) game grid position     */
-/*                                                                   */
-/*  Return: NULL (0) on success, pointer to sprite or -1 on failure  */
 /*...................................................................*/
 void TileDisplay(BackgroundTile *background, int locationX,
                  int locationY)
@@ -83,7 +81,7 @@ void TileDisplay(BackgroundTile *background, int locationX,
   // Display any sprite on the tile
   if (background->sprite)
   {
-    // Always display the player sprite 
+    // Always display the player sprite
     if (background->sprite->stats.flags & IS_PLAYER)
     {
       PlayerTileDisplay(GAME_GRID_START_X +(locationX * TILE_WIDTH),
@@ -137,12 +135,12 @@ SpriteTile *SpriteMove(SpriteTile *spriteTile, int tileX, int tileY)
   theTerrain = spriteTile->currentWorld->tiles;
   if (theTerrain[tileX + tileY * GAME_GRID_WIDTH].sprite)
     return theTerrain[tileX + tileY * GAME_GRID_WIDTH].sprite;
-  
+
   // Find the current background tile of the sprite
   theTerrain = &theTerrain[spriteTile->locationX +
                            spriteTile->locationY * GAME_GRID_WIDTH];
   if (theTerrain->sprite != spriteTile)
-    puts("Terrain creature mismatch");          
+    puts("Terrain creature mismatch");
 
   // Clear the sprite from this tile
   theTerrain->sprite = NULL;

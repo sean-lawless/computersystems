@@ -1,12 +1,12 @@
 /*...................................................................*/
 /*                                                                   */
 /*   Module:  main.c                                                 */
-/*   Version: 2015.0                                                 */
-/*   Purpose: main function for console application                  */
+/*   Version: 2019.0                                                 */
+/*   Purpose: main function for game application                     */
 /*                                                                   */
 /*...................................................................*/
 /*                                                                   */
-/*                   Copyright 2015, Sean Lawless                    */
+/*                   Copyright 2019, Sean Lawless                    */
 /*                                                                   */
 /*                      ALL RIGHTS RESERVED                          */
 /*                                                                   */
@@ -90,10 +90,7 @@ int main(void)
 
   /* display the introductory splash */
   puts("Game application");
-  putbyte(OgSp >> 24);
-  putbyte(OgSp >> 16);
-  putbyte(OgSp >> 8);
-  putbyte(OgSp);
+  putu32(OgSp);
   puts(" : stack pointer");
 
 #if ENABLE_OS

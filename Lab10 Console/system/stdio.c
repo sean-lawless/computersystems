@@ -36,7 +36,6 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /*...................................................................*/
 #include <system.h>
-#include <board.h>
 #include <stdio.h>
 
 #if ENABLE_OS
@@ -146,12 +145,12 @@ int puts(const char *string)
 #endif
     Uart1Puts(string);
 #endif
-#endif /* ENABLE_OS */
 #if ENABLE_VIDEO
   /* Output on the video screen. */
   if (ScreenUp)
     ConsoleState.puts(string);
 #endif
+#endif /* ENABLE_OS */
 
   return 0;
 }

@@ -107,11 +107,11 @@ void Uart1Init(void)
 
   /* Disable pull up/down for next configured GPIOs so they float. */
   REG32(GPPUD) = GPPUD_OFF;
-  usleep(T1_MICROSECOND / T1_MILLISECOND); /* hold time */
+  usleep(MICROS_PER_MILLISECOND); /* hold time */
 
   /* Apply above configuration (floating) to UART Rx and Tx GPIOs. */
   REG32(GPPUDCLK0) = (1 << 14) | (1 << 15); /* GPIO 14 and 15 */
-  usleep(T1_MICROSECOND / T1_MILLISECOND); /* hold time */
+  usleep(MICROS_PER_MILLISECOND); /* hold time */
 
   /* Set the baud rate. */
   REG32(UART_BAUD) = BAUD_DIV;

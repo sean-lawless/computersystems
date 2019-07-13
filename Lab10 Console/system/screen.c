@@ -46,7 +46,7 @@
 /*...................................................................*/
 /* Type Definitions                                                  */
 /*...................................................................*/
-typedef struct ScreenDevice
+typedef struct
 {
   u32 initWidth;
   u32 initHeight;
@@ -62,14 +62,12 @@ typedef struct ScreenDevice
   u32 cursorOffsetY;
   u32 cursorHeight;
   u32 cursorWidth;
-}
-ScreenDevice;
+} ScreenDevice;
 
 /*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
 ScreenDevice TheScreen;
-int FrameBufferIndex;
 
 /*...................................................................*/
 /* Local Static Functions                                            */
@@ -116,7 +114,7 @@ static void clear_display(ScreenDevice *screen)
 
   buffer = screen->buffer;
   size = screen->size / sizeof(ScreenColor);
-  
+
   while (size--)
     *buffer++ = COLOR_BLACK;
 }
@@ -144,7 +142,7 @@ static void screen_init(ScreenDevice *screen, u32 width, u32 height)
   // Check cursor console sizes and trim to screen size if necessary
   if (screen->cursorOffsetX + screen->cursorWidth > screen->initWidth)
     screen->cursorWidth = screen->initWidth - screen->cursorOffsetX;
-  if (screen->cursorOffsetY + screen->cursorHeight > screen->initHeight)
+  if (screen->cursorOffsetY + screen->cursorHeight >screen->initHeight)
     screen->cursorHeight = screen->initHeight - screen->cursorOffsetY;
 }
 
@@ -196,7 +194,7 @@ static int screen_device_init(ScreenDevice *screen)
 
   // Polpulate the screen from the resulting framebuffer
   screen->buffer = (ScreenColor *)FrameBufferGetBuffer(
-                                                   screen->frameBuffer);
+                                                  screen->frameBuffer);
   screen->size   = FrameBufferGetSize(screen->frameBuffer);
   screen->width  = FrameBufferGetWidth(screen->frameBuffer);
   screen->height = FrameBufferGetHeight(screen->frameBuffer);
@@ -230,7 +228,7 @@ static void scroll(ScreenDevice *screen)
   {
     for (lines = 0; lines < CharacterHeight(); ++lines)
     {
-      to = (screen->buffer + CONSOLE_X_ORIENTATION + (lines + cursorY) *
+      to = (screen->buffer + CONSOLE_X_ORIENTATION +(lines + cursorY) *
                     FrameBufferGetWidth(screen->frameBuffer));
       from = (screen->buffer + CONSOLE_X_ORIENTATION +
               ((lines + cursorY + CharacterHeight()) *
@@ -261,9 +259,9 @@ static void scroll(ScreenDevice *screen)
       memset(from, COLOR_BLACK, size);
     }
   }
-    
+
   scroll_time = TimerNow() - scroll_time;
-    
+
 //  putbyte((u8)(scroll_time >> 24));
 //  putbyte((u8)(scroll_time >> 16));
 //  putbyte((u8)(scroll_time >> 8));

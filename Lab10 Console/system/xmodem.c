@@ -45,10 +45,10 @@
 /*...................................................................*/
 /* Configuration                                                     */
 /*...................................................................*/
-#define XMODEM_PACKET_SIZE 132
-#define XMODEM_DATA_SIZE   128
-#define XMODEM_DATA_TIMEO  (MICROS_PER_SECOND)
-#define XMODEM_DATA_RETRY  30
+#define XMODEM_PACKET_SIZE     132
+#define XMODEM_DATA_SIZE       128
+#define XMODEM_DATA_TIMEO      (MICROS_PER_SECOND)
+#define XMODEM_DATA_RETRY      30
 
 /*...................................................................*/
 /* Symbols                                                           */
@@ -88,10 +88,10 @@ struct xmodem_state XmodemState;
 /*                                                                   */
 /* Returns the block number or -1 if error                           */
 /*...................................................................*/
-static int process_xmodem(unsigned char *packet, int block)
+static int process_xmodem(u8 *packet, int block)
 {
-  unsigned int i;
-  unsigned char checksum;
+  u32 i;
+  u8 checksum;
 
   /* Return error if first character is not SOH. */
   if (packet[0] != SOH)
@@ -161,7 +161,7 @@ void XmodemInit(void)
 /*                                                                   */
 /*     Returns: task state structure                                 */
 /*...................................................................*/
-void *XmodemStart(unsigned char *destination, int length)
+void *XmodemStart(u8 *destination, int length)
 {
   /* Initialize the xmodem state. */
 #if ENABLE_OS
@@ -304,11 +304,12 @@ int XmodemPoll(void *data)
 /*...................................................................*/
 /* XmodemDownload: download data from a peer using Xmodem            */
 /*                                                                   */
-/*       Input: timeout value                                        */
+/*       Input: destination is address to copy the downloaded data   */
+/*              length is the maximum amount of data to download     */
 /*                                                                   */
 /*     Returns: length of download on success, or -1 if error        */
 /*...................................................................*/
-int XmodemDownload(unsigned char *destination, int length)
+int XmodemDownload(u8 *destination, int length)
 {
   struct xmodem_state *state;
 

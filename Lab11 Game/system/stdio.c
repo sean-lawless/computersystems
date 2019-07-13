@@ -36,7 +36,6 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /*...................................................................*/
 #include <system.h>
-#include <board.h>
 #include <stdio.h>
 
 #if ENABLE_OS
@@ -162,7 +161,6 @@ int puts(const char *string)
 /*      Inputs: byte - the byte to transmit (Tx) to UART             */
 /*                                                                   */
 /*     Returns: the value of the byte that was transmitted           */
-/*                                                                   */
 /*...................................................................*/
 u8 putbyte(u8 byte)
 {

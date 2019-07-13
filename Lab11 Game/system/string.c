@@ -62,15 +62,14 @@ const char *strchr(const char *string, char find)
   return NULL;
 }
 
-/***********************************************************************/
-/*    strnlen: count the length of a string up to a limit              */
-/*                                                                     */
-/*      Inputs: string - the string                                    */
-/*              length - the maximum string length                     */
-/*                                                                     */
-/*     Returns: Success (0)                                            */
-/*                                                                     */
-/***********************************************************************/
+/*...................................................................*/
+/*     strnlen: count the length of a string up to a limit           */
+/*                                                                   */
+/*      Inputs: string - the string                                  */
+/*              length - the maximum string length                   */
+/*                                                                   */
+/*     Returns: Success (0)                                          */
+/*...................................................................*/
 int strnlen(const char *string, int length)
 {
   int len;
@@ -190,7 +189,8 @@ void *memcpy(void *dst, const void *src, size_t length)
   {
     // If 64 bits remaining and aligned, copy 64 bytes at a time
     if ((length - bytes > 7) &&
-        (((uintptr_t)dst & 7) == 0) && (((uintptr_t)src & 7) == 0))
+        (((uintptr_t)&destination[bytes] & 7) == 0) &&
+        (((uintptr_t)&source[bytes] & 7) == 0))
     {
       u64 *dest64 = (u64 *)&destination[bytes];
       const u64 *src64 = (u64 *)&source[bytes];
@@ -203,7 +203,8 @@ void *memcpy(void *dst, const void *src, size_t length)
 
     // If 32 bits remaining and aligned, copy 32 bytes at a time
     if ((length - bytes > 3) &&
-        (((uintptr_t)dst & 3) == 0) && (((uintptr_t)src & 3) == 0))
+        (((uintptr_t)&destination[bytes] & 3) == 0) &&
+        (((uintptr_t)&source[bytes] & 3) == 0))
     {
       u32 *dest32 = (u32 *)&destination[bytes];
       const u32 *src32 = (u32 *)&source[bytes];

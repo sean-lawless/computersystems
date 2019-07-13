@@ -128,7 +128,7 @@ int RxErrorCount;
 /*...................................................................*/
 /* Local Functions                                                   */
 /*...................................................................*/
-#if ENABLE_BOOT
+#if ENABLE_BOOTLOADER
 /*...................................................................*/
 /* Process an xmodem packet                                          */
 /*                                                                   */
@@ -277,7 +277,7 @@ void UartPutc(char character)
 unsigned int UartRxCheck(void)
 {
   /* If RX FIFO is empty return zero, otherwise one. */
-  if (REG32(UART_STATUS) & RX_FIFO_EMPTY)
+  if (REG32(UART0_STATUS) & RX_FIFO_EMPTY)
     return 0;
   else
     return 1;
@@ -294,7 +294,7 @@ char UartGetc(void)
   u32 character, status;
 
   /* Loop until UART Rx FIFO is no longer empty. */
-  while (!Uart0RxCheck()) ;
+  while (!UartRxCheck()) ;
 
   /* Read the character. */
   character = REG32(UART0_DATA);
@@ -331,7 +331,7 @@ void UartFlush(void)
   }
 }
 
-#if ENABLE_BOOT
+#if ENABLE_BOOTLOADER
 /*...................................................................*/
 /* XmodemDownload: copy a file with the Xmodem protocol              */
 /*                                                                   */
@@ -435,6 +435,6 @@ int XmodemDownload(unsigned char *destination, int length)
   /* Return the length of the resulting xmodem transfer. */
   return rcvd;
 }
-#endif /* ENABLE_BOOT */
+#endif /* ENABLE_BOOTLOADER */
 
 

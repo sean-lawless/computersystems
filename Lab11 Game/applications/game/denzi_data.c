@@ -485,15 +485,15 @@ static int tile_pixel(u8 *tileSetData, int tileNum, u32 x, u32 y)
 
     // Reference this bit in first byte of tile data. Return if tile
     // bit set or not.
-    return ((tileRow[0] & tilebit) > 0 ? 1 : 0);
+    return ((tileRow[0] & tilebit) ? 1 : 0);
   }
   else
   {
     tilebit = ((1 << 7) >> (x - 8));
 
-	  // Reference this bit in second byte of tile data. Return if tile
+    // Reference this bit in second byte of tile data. Return if tile
     // bit set or not.
-	  return ((tileRow[1] & tilebit) > 0 ? 1 : 0);
+    return ((tileRow[1] & tilebit) ? 1 : 0);
   }
 }
 

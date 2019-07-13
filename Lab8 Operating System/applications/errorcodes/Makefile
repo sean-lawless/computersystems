@@ -9,7 +9,6 @@
 ##
 CP	= cp
 RM	= rm
-LN	= ln
 C	= arm-none-eabi-gcc
 CC	= arm-none-eabi-gcc
 CPP	= arm-none-eabi-gcc
@@ -22,6 +21,7 @@ PLINK	= arm-none-eabi-objcopy
 ## Definitions:
 ##
 APPNAME = errorcodes
+
 # Define the RPI hardware version: 1 is up to B+, 2 is 2, 3 is up to 3 B+
 EXTRAS = -DRPI=3 -ffreestanding
 # Begin Historic/Depricated/Older GCC
@@ -34,9 +34,9 @@ EXTRAS = -DRPI=3 -ffreestanding
 # End Historic/Depricated/Older GCC
 
 ##Warnings about everything and optimize for size or speed (-Os or -O2)
-#CFLAGS = -Wall -O2 $(EXTRAS)
+CFLAGS = -Wall -O2 $(EXTRAS)
 ##Warnings and debugging build, with GDB and no optimizations (-O0)
-CFLAGS = -Wall -ggdb -O0 $(EXTRAS)
+#CFLAGS = -Wall -ggdb -O0 $(EXTRAS)
 
 ASFLAGS =
 ##RPI 3
@@ -48,7 +48,7 @@ ASFLAGS =
 INCLUDES = -I. -I../../include -I../../boards/rpi
 
 ##
-## LED error code application
+## Error code application
 ##
 OBJECTS = ../../boards/rpi/app.o \
           ../../boards/rpi/board.o \
@@ -70,7 +70,7 @@ LIBS =
 	$(CC) -c $(CFLAGS) $(INCLUDES) -o $@ $<
 
 .s.o:
-	$(AS) $(ASFLAGS) -o $@ $<
+	$(AS) $(ASFLAGS) $(INCLUDES) -o $@ $<
 
 .cpp.o:
 	$(CPP) -c $(CFLAGS) $(INCLUDES) -o $@ $<

@@ -106,33 +106,31 @@ void *memcpy(void *dst, const void *src, int length)
   for (bytes = 0; bytes < length; ++bytes)
   {
     // If 64 bits remaining and aligned, copy 64 bytes at a time
-    if ((bytes > 7) &&
-        (((uintptr_t)dst & 7) == 0) && (((uintptr_t)src & 7) == 0))
+    if ((length - bytes > 7) &&
+        (((uintptr_t)&destination[bytes] & 7) == 0) &&
+        (((uintptr_t)&source[bytes] & 7) == 0))
     {
-      u64 *dest64 = dst;
-      const u64 *src64 = src;
+      u64 *dest64 = (u64 *)&destination[bytes];
+      const u64 *src64 = (u64 *)&source[bytes];
 
       for (i = 0; i < (length - bytes) / 8; ++i)
         dest64[i] = src64[i];
 
-      destination = &destination[i * 8];
-      source = &source[i * 8];
-      bytes = (length - bytes) % 8;
+      bytes += i * 8 - 1;
     }
 
     // If 32 bits remaining and aligned, copy 32 bytes at a time
-    if ((bytes > 3) &&
-        (((uintptr_t)dst & 3) == 0) && (((uintptr_t)src & 3) == 0))
+    if ((length - bytes > 3) &&
+        (((uintptr_t)&destination[bytes] & 3) == 0) &&
+        (((uintptr_t)&source[bytes] & 3) == 0))
     {
-      u32 *dest32 = dst;
-      const u32 *src32 = src;
+      u32 *dest32 = (u32 *)&destination[bytes];
+      const u32 *src32 = (u32 *)&source[bytes];
 
       for (i = 0; i < (length - bytes) / 4; ++i)
         dest32[i] = src32[i];
 
-      destination = &destination[i * 4];
-      source = &source[i * 4];
-      bytes = (length - bytes) % 4;
+      bytes += i * 4 - 1;
     }
 
     // Otherwise copy one byte

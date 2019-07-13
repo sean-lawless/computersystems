@@ -644,14 +644,13 @@ int TimerPoll(void *data)
 void usleep(u64 microseconds)
 {
   struct timer tw;
-  u64 now = 1;
 
   /* Create a timer that expires 'microseconds' from now. */
   tw = TimerRegister(microseconds);
 
   /* Loop checking the timer until it expires. */
-  for (;now > 0;)
-    now = TimerRemaining(&tw);
+  for (;TimerRemaining(&tw) > 0;)
+    ; // Do nothing
 }
 
 #if ENABLE_SHELL
@@ -690,3 +689,4 @@ u32 Color32(u8 red, u8 green, u8 blue, u8 alpha)
             ((red) & 0xFF) << 16 | ((alpha) & 0xFF) << 24);
 }
 #endif
+

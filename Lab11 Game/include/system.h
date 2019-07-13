@@ -59,7 +59,7 @@
 ** Time definitions
 */
 #define MICROS_PER_SECOND      1000000 /* Microseconds per second */
-#define MICROS_PER_MILLISECOND 1000    /* Microseconds per millisecond */
+#define MICROS_PER_MILLISECOND 1000  /* Microseconds per millisecond */
 
 /*
 ** Polled task return values
@@ -114,9 +114,9 @@ typedef unsigned long      size_t;
 typedef unsigned long      uintptr_t;
 
 #if COLOR_DEPTH_BITS == 16
-  #define COLOR16(red, green, blue)   ((((u16)red) & 0x1F) << 11 \
-                                    | (((u16)green) & 0x1F) << 6 \
-                                    | (((u16)blue) & 0x1F))
+  #define COLOR16(red, green, blue)   (((((u16)red) & 0x1F) << 11) | \
+                                       ((((u16)green) & 0x1F) << 6) | \
+                                       ((((u16)blue) & 0x1F)))
   typedef u16 ScreenColor;
 #elif COLOR_DEPTH_BITS == 32
   typedef u32 ScreenColor;
@@ -150,18 +150,18 @@ struct timer_state
 /*
  * Task structures
 */
-typedef struct
+struct ShellCmd
 {
   char *command;
   int (*function)(const char *command);
-} ShellCmd;
+};
 
 struct task
 {
   int (*poll) (void *data);
   void *data;
   void *stdio;
-} Task;
+};
 
 /*
  * State structures
@@ -175,7 +175,7 @@ struct led_state
 struct shell_state
 {
   u8 command[COMMAND_LENGTH], i;
-  ShellCmd *cmd;
+  struct ShellCmd *cmd;
   void *param;
   int result;
   char (*getc)(void);
@@ -213,8 +213,8 @@ void Uart1Init(void);
 /*
  * Xmodem interface
 */
-void *XmodemStart(unsigned char *destination, int length);
-int XmodemDownload(unsigned char *destination, int length);
+void *XmodemStart(u8 *destination, int length);
+int XmodemDownload(u8 *destination, int length);
 int XmodemPoll(void *data);
 
 /*
@@ -224,9 +224,9 @@ int XmodemPoll(void *data);
 void usleep(u64 microseconds);
 struct timer TimerRegister(u64 microseconds);
 u64 TimerRemaining(struct timer *tw);
-struct timer TimerSchedule(unsigned int usec,
-                        int (*poll) (u32 id, void *data, void *context),
-                        void *data, void *context);
+struct timer TimerSchedule(u32 usec,
+                       int (*poll) (u32 id, void *data, void *context),
+                       void *data, void *context);
 int TimerCancel(void *poll, void *data);
 u64 TimerNow(void);
 
