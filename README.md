@@ -1,6 +1,6 @@
 # Computer Systems
 
-##Introduction
+## Introduction
 
 Welcome to the repository for the book Computer Systems Incremental Systems Engineering and associated Laboratory for Raspberry Pi. This source code repository is organized by the chapters of the book, one (1) through (11). Each chapter is an accumulation of the chapters before it. Any change requests or bug reports should be submitted in regards to the final chapter 11 if applicable (unless bug only exists in previous chapter).
 
