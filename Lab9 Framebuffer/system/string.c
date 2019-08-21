@@ -1,7 +1,7 @@
 /*...................................................................*/
 /*                                                                   */
 /*   Module:  string.c                                               */
-/*   Version: 2015.0                                                 */
+/*   Version: 2019.0                                                 */
 /*   Purpose: String routines                                        */
 /*                                                                   */
 /*...................................................................*/
@@ -62,15 +62,14 @@ const char *strchr(const char *string, char find)
   return NULL;
 }
 
-/***********************************************************************/
-/*    strnlen: count the length of a string up to a limit              */
-/*                                                                     */
-/*      Inputs: string - the string                                    */
-/*              length - the maximum string length                     */
-/*                                                                     */
-/*     Returns: Success (0)                                            */
-/*                                                                     */
-/***********************************************************************/
+/*...................................................................*/
+/*     strnlen: count the length of a string up to a limit           */
+/*                                                                   */
+/*      Inputs: string - the string                                  */
+/*              length - the maximum string length                   */
+/*                                                                   */
+/*     Returns: Success (0)                                          */
+/*...................................................................*/
 int strnlen(const char *string, int length)
 {
   int len;
@@ -164,7 +163,7 @@ int memcmp(const void *data1, const void *data2, size_t length)
   // Return zero if equal, or index of unequal byte
   if (i == length)
     return 0;
-  else if (((u8 *)data1)[i] > ((u8 *)data1)[i])
+  else if (((u8 *)data1)[i] > ((u8 *)data2)[i])
     return i + 1; // Positive index if greater than
   else
     return -(i + 1); // Negative index if less than
@@ -181,43 +180,13 @@ int memcmp(const void *data1, const void *data2, size_t length)
 /*...................................................................*/
 void *memcpy(void *dst, const void *src, size_t length)
 {
-  int i, bytes;
+  int bytes;
   u8 *destination = dst;
   const u8 *source = src;
 
   // Loop until all bytes are copied
   for (bytes = 0; bytes < length; ++bytes)
-  {
-    // If 64 bits remaining and aligned, copy 64 bytes at a time
-    if ((length - bytes > 7) &&
-        (((uintptr_t)dst & 7) == 0) && (((uintptr_t)src & 7) == 0))
-    {
-      u64 *dest64 = (u64 *)&destination[bytes];
-      const u64 *src64 = (u64 *)&source[bytes];
-
-      for (i = 0; i < (length - bytes) / 8; ++i)
-        dest64[i] = src64[i];
-
-      bytes += i * 8 - 1;
-    }
-
-    // If 32 bits remaining and aligned, copy 32 bytes at a time
-    if ((length - bytes > 3) &&
-        (((uintptr_t)dst & 3) == 0) && (((uintptr_t)src & 3) == 0))
-    {
-      u32 *dest32 = (u32 *)&destination[bytes];
-      const u32 *src32 = (u32 *)&source[bytes];
-
-      for (i = 0; i < (length - bytes) / 4; ++i)
-        dest32[i] = src32[i];
-
-      bytes += i * 4 - 1;
-    }
-
-    // Otherwise copy one byte
-    else
-      destination[bytes] = source[bytes];
-  }
+    destination[bytes] = source[bytes];
   return dst;
 }
 

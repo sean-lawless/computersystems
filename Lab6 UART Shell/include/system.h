@@ -38,8 +38,6 @@
 #ifndef _SYSTEM_H
 #define _SYSTEM_H
 
-#include <configure.h>
-
 /*...................................................................*/
 /* Symbol Definitions                                                */
 /*...................................................................*/
@@ -53,7 +51,7 @@
 ** Time definitions
 */
 #define MICROS_PER_SECOND      1000000 /* Microseconds per second */
-#define MICROS_PER_MILLISECOND 1000    /* Microseconds per millisecond */
+#define MICROS_PER_MILLISECOND 1000  /* Microseconds per millisecond */
 
 /*...................................................................*/
 /* Macro Definitions                                                 */

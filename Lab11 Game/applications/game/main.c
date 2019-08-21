@@ -70,8 +70,7 @@ int main(void)
   TaskNew(0, ShellPoll, &Uart1State);
 #endif
 
-  // Initialize the timer and LED tasks
-  TaskNew(1, TimerPoll, &TimerState);
+  // Initialize the LED tasks
   TaskNew(MAX_TASKS - 1, LedPoll, &LedState);
 #endif /* ENABLE_OS */
 

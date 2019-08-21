@@ -39,133 +39,203 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <board.h>
-#include "denzi_data.h"
 #include "game_grid.h"
 
 #if ENABLE_GAME
 
+Tile GameGrid[GAME_GRID_WIDTH * GAME_GRID_HEIGHT];
+World TheWorld;
+
 /*...................................................................*/
-/* TileDisplay: Display a game grid tile (background, item, sprite)  */
+/*  TileClear: Set all pixels to zero (black) for a tile location    */
 /*                                                                   */
-/*   Input: background is pointer to game grid background tile       */
-/*          locationX indicate the X (width) game grid position      */
-/*          locationY indicate the Y (height) game grid position     */
+/*      Input: x the starting x (width) pixel position               */
+/*             y the starting y (height) pixel position              */
 /*...................................................................*/
-void TileDisplay(BackgroundTile *background, int locationX,
-                 int locationY)
+void TileClear(u32 x, u32 y)
 {
-  // Clear the tile
-  TileClear(GAME_GRID_START_X + (locationX * TILE_WIDTH),
-            GAME_GRID_START_Y + (locationY * TILE_HEIGHT));
+  int i, j;
 
-  // Convert to pixels and display background again
-  BackgroundTileDisplay(GAME_GRID_START_X +(locationX * TILE_WIDTH),
-                        GAME_GRID_START_Y + (locationY * TILE_HEIGHT),
-                      background->tile.color, background->tile.tileNum);
+  // Clear the pixels (set to zero or black)
+  for (i = 0; i < TILE_HEIGHT; ++i)
+    for (j = 0; j < TILE_WIDTH; ++j)
+      SetPixel(x + j, y + i, 0);
+}
 
-  // Mark background tile as visible
-  background->tile.flags |= IS_VISIBLE;
+/*...................................................................*/
+/*  TileDisplayScreen: Display a Tile at a pixel position            */
+/*                                                                   */
+/*      Input: tile pointer to Tile structure                        */
+/*             x the starting x (width) pixel position               */
+/*             y the starting y (height) pixel position              */
+/*...................................................................*/
+void TileDisplayScreen(Tile *tile, u32 x, u32 y)
+{
+  u32 tileX, tileY;
 
-  // Display an item if on this terrain
-  if (background->item)
+  // Display the pixels based on image bit map
+  for (tileY = 0; tileY < TILE_HEIGHT; tileY++)
   {
-    ItemTileDisplay(GAME_GRID_START_X +
-        (locationX * TILE_WIDTH), GAME_GRID_START_Y +
-        (locationY * TILE_HEIGHT), background->item->tile.color,
-        background->item->tile.tileNum);
-
-    // Mark the item tile as visible
-    background->item->tile.flags |= IS_VISIBLE;
-  }
-
-  // Display any sprite on the tile
-  if (background->sprite)
-  {
-    // Always display the player sprite
-    if (background->sprite->stats.flags & IS_PLAYER)
+    for (tileX = 0; tileX < TILE_WIDTH; tileX++)
     {
-      PlayerTileDisplay(GAME_GRID_START_X +(locationX * TILE_WIDTH),
-                        GAME_GRID_START_Y + (locationY * TILE_HEIGHT),
-                        background->sprite->tile.color,
-                        background->sprite->tile.tileNum);
-
-      // Mark the sprite tile as visible
-      background->sprite->tile.flags |= IS_VISIBLE;
-    }
-
-    // Otherwise display the sprite if visisble
-    else if (background->sprite->tile.flags & IS_VISIBLE)
-    {
-      SpriteTileDisplay(GAME_GRID_START_X +(locationX * TILE_WIDTH),
-                        GAME_GRID_START_Y + (locationY * TILE_HEIGHT),
-                        background->sprite->tile.color,
-                        background->sprite->tile.tileNum);
+      if ((tile->flags & SHOW_FLIPPED) && (tile->flags & SHOW_REVERSE))
+      {
+        if (TilePixel(tile->bitmap, tile->tileNum, (TILE_WIDTH - 1) - tileX,
+                      (TILE_HEIGHT - 1) - tileY))
+          SetPixel(x + tileX, y + tileY, tile->color);
+      }
+      else if (tile->flags & SHOW_FLIPPED)
+      {
+        if (TilePixel(tile->bitmap, tile->tileNum,
+                      tileX, (TILE_HEIGHT - 1) - tileY))
+          SetPixel(x + tileX, y + tileY, tile->color);
+      }
+      else if (tile->flags & SHOW_REVERSE)
+      {
+        if (TilePixel(tile->bitmap, tile->tileNum, (TILE_WIDTH - 1) - tileX,
+                      tileY))
+          SetPixel(x + tileX, y + tileY, tile->color);
+      }
+      else
+      {
+        if (TilePixel(tile->bitmap, tile->tileNum, tileX, tileY))
+          SetPixel(x + tileX, y + tileY, tile->color);
+      }
     }
   }
 }
 
 /*...................................................................*/
-/* SpriteMove: Move sprite to a new background tile                  */
+/*  TileDisplayGrid: Display a Tile at a grid position               */
 /*                                                                   */
-/*   Input: creatureTile is pointer to creature sprite to move       */
-/*          tileX indicate the new X tile position                   */
-/*          tileY indicate the new Y tile position                   */
-/*                                                                   */
-/*  Return: NULL (0) on success, pointer to sprite or -1 on failure  */
+/*      Input: locationX the x (width) grid position                 */
+/*             locationY the y (height) grid position                */
 /*...................................................................*/
-SpriteTile *SpriteMove(SpriteTile *spriteTile, int tileX, int tileY)
+void TileDisplayGrid(int locationX, int locationY)
 {
-  BackgroundTile *theTerrain;
+  Tile *stackedTile, *tile = GameGridTile(locationX, locationY);
 
-  // Return success if this sprite is already on this tile
-  if ((tileX == spriteTile->locationX) &&
-      (tileY == spriteTile->locationY))
-    return NULL;
+  // Return if invalid game grid location or not visible
+  if ((tile == NULL) || !(tile->flags & IS_VISIBLE))
+    return;
+
+#if CIRCULAR_LIST
+  {
+    u32 tileX, tileY;
+    int x = GAME_GRID_START_X + (locationX * TILE_WIDTH);
+    int y = GAME_GRID_START_Y + (locationY * TILE_HEIGHT);
+
+    // Display the pixels based on top down rendering of stacked tiles
+    for (tileY = 0; tileY < TILE_HEIGHT; tileY++)
+    {
+      for (tileX = 0; tileX < TILE_WIDTH; tileX++)
+      {
+        for (stackedTile = (void *)tile->list.previous;
+             stackedTile;
+             stackedTile = (void *)stackedTile->list.previous)
+        {
+          if (!(stackedTile->flags & IS_VISIBLE))
+            continue;
+
+          if ((stackedTile->flags & SHOW_FLIPPED) &&
+              (stackedTile->flags & SHOW_REVERSE))
+          {
+            if (TilePixel(stackedTile->bitmap, stackedTile->tileNum,
+                          (TILE_WIDTH - 1) - tileX,
+                          (TILE_HEIGHT - 1) - tileY))
+            {
+              SetPixel(x + tileX, y + tileY, stackedTile->color);
+              break;
+            }
+          }
+          else if (stackedTile->flags & SHOW_FLIPPED)
+          {
+            if (TilePixel(stackedTile->bitmap, stackedTile->tileNum,
+                          tileX, (TILE_HEIGHT - 1) - tileY))
+            {
+              SetPixel(x + tileX, y + tileY, stackedTile->color);
+              break;
+            }
+          }
+          else if (stackedTile->flags & SHOW_REVERSE)
+          {
+            if (TilePixel(stackedTile->bitmap, stackedTile->tileNum,
+                          (TILE_WIDTH - 1) - tileX, tileY))
+            {
+              SetPixel(x + tileX, y + tileY, stackedTile->color);
+              break;
+            }
+          }
+          else
+          {
+            if (TilePixel(stackedTile->bitmap, stackedTile->tileNum,
+                          tileX, tileY))
+            {
+              SetPixel(x + tileX, y + tileY, stackedTile->color);
+              break;
+            }
+          }
+
+          // If we have circled back to start of the list then break out
+          if (stackedTile == tile)
+          {
+            SetPixel(x + tileX, y + tileY, COLOR_BLACK);
+            break;
+          }
+        }
+      }
+    }
+  }
+#else /* CIRCULAR_LIST */
+
+  // Clear the tile
+  TileClear(GAME_GRID_START_X + (locationX * TILE_WIDTH),
+            GAME_GRID_START_Y + (locationY * TILE_HEIGHT));
+
+  // Convert to pixels and display tile
+  TileDisplayScreen(tile, GAME_GRID_START_X +(locationX * TILE_WIDTH),
+                    GAME_GRID_START_Y + (locationY * TILE_HEIGHT));
+
+  // Display any stacked tiles in a NULL ending or circular list
+  for (stackedTile = (void *)tile->list.next;
+       stackedTile && (stackedTile != tile);
+       stackedTile = (void *)stackedTile->list.next)
+  {
+    if (stackedTile->flags & IS_VISIBLE)
+      TileDisplayScreen(stackedTile, GAME_GRID_START_X +
+                        (locationX * TILE_WIDTH), GAME_GRID_START_Y +
+                        (locationY * TILE_HEIGHT));
+  }
+#endif
+}
+
+/*...................................................................*/
+/* GameGridTile: Look up a base Tile from game grid coordinates      */
+/*                                                                   */
+/*   Input: x is the horizontal coordinate                           */
+/*          y is the vertical coordinate                             */
+/*                                                                   */
+/*  Return: TASK_FINISHED                                            */
+/*...................................................................*/
+Tile *GameGridTile(int x, int y)
+{
+  Tile *theTerrain;
 
   // Ensure tile is not out of range of game grid
-  if ((tileX >= spriteTile->currentWorld->x) ||
-      (tileY >= spriteTile->currentWorld->y) ||
-      (tileX < 0) || (tileY < 0))
+  if ((x >= TheWorld.x) ||
+      (y >= TheWorld.y) ||
+      (x < 0) || (y < 0))
   {
-    puts("Move creature out of range");
-    return (void *)-1;
+    puts("Game grid out of range");
+    return NULL;
   }
 
-  // Return sprite if present on the new game grid
-  theTerrain = spriteTile->currentWorld->tiles;
-  if (theTerrain[tileX + tileY * GAME_GRID_WIDTH].sprite)
-    return theTerrain[tileX + tileY * GAME_GRID_WIDTH].sprite;
+  // Find the tile within the array of background tiles
+  theTerrain = TheWorld.tiles;
+  theTerrain = &theTerrain[x + y * GAME_GRID_WIDTH];
 
-  // Find the current background tile of the sprite
-  theTerrain = &theTerrain[spriteTile->locationX +
-                           spriteTile->locationY * GAME_GRID_WIDTH];
-  if (theTerrain->sprite != spriteTile)
-    puts("Terrain creature mismatch");
-
-  // Clear the sprite from this tile
-  theTerrain->sprite = NULL;
-
-  // Redraw the tile if visiable
-  if (theTerrain->tile.flags & IS_VISIBLE)
-    TileDisplay(theTerrain, spriteTile->locationX,
-                          spriteTile->locationY);
-
-  // Update this sprite with its new location
-  spriteTile->locationX = tileX;
-  spriteTile->locationY = tileY;
-
-  // Find the new background tile of the sprite
-  theTerrain = spriteTile->currentWorld->tiles;
-  theTerrain = &theTerrain[tileX + tileY * GAME_GRID_WIDTH];
-
-  // Let background tile know a sprite is on it
-  theTerrain->sprite = spriteTile;
-
-  // Redraw the tile if visiable
-  if (theTerrain->tile.flags & IS_VISIBLE)
-    TileDisplay(theTerrain, tileX, tileY);
-
-  return NULL;
+  // Return only a pointer to the tile portion of the background
+  return (Tile *)theTerrain;
 }
 
 #endif /* ENABLE_GAME */

@@ -42,6 +42,8 @@
 
 #if ENABLE_SHELL
 
+#define MAX_SHELL_COMMANDS     16
+
 /*
 ** Shell Functions
 */
@@ -55,7 +57,7 @@ static int quit(const char *command);
 /*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
-static ShellCmd ShellCommands[16];
+static struct ShellCmd ShellCommands[MAX_SHELL_COMMANDS];
 struct shell_state Uart0State, Uart1State;
 
 /*...................................................................*/
@@ -68,7 +70,7 @@ struct shell_state Uart0State, Uart1State;
 /*   input: command = the entire command                             */
 /*                                                                   */
 /*  return: TASK_FINISHED                                            */
-/*.................................................................. */
+/*...................................................................*/
 static int echo(const char *command)
 {
   /* Echo the command to all consoles. */
@@ -143,7 +145,7 @@ static int xmodem(const char *command)
 /*                                                                   */
 /*      Return: pointer to command function                          */
 /*...................................................................*/
-static ShellCmd *shell(const char *command)
+static struct ShellCmd *shell(const char *command)
 {
   int i;
 
@@ -200,6 +202,7 @@ int ShellInit(void)
 /*...................................................................*/
 int ShellPoll(void *data)
 {
+  static u64 command_time;
   struct shell_state *state = data;
 
   /* Check if command is currently executing. */
@@ -209,7 +212,7 @@ int ShellPoll(void *data)
     if ((state->cmd->function == run) ||
         (state->cmd->function == quit))
     {
-      ShellCmd *temp = state->cmd;
+      struct ShellCmd *temp = state->cmd;
 
       /* Clear the shell command so ShellPoll is reentrant. */
       state->i = 0;
@@ -228,6 +231,10 @@ int ShellPoll(void *data)
     /* If execution has not finished return status. */
     if (state->result != TASK_FINISHED)
       return state->result;
+
+    /* Calculate clock delta and return command result. */
+    command_time = TimerNow() - command_time;
+    putu32(command_time);
 
     /* Restore led timer. */
     LedTime = LedTime * 8;

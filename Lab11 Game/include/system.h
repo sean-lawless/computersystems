@@ -125,6 +125,15 @@ typedef unsigned long      uintptr_t;
 #endif
 
 /*
+ * List structures
+*/
+struct double_link
+{
+  struct double_link *next;
+  struct double_link *previous;
+};
+
+/*
  * Timer structures
 */
 struct timer
@@ -133,34 +142,22 @@ struct timer
   u64 last;
 };
 
-struct timer_task
-{
-  struct timer expire;
-  int (*poll) (u32 id, void *data, void *context);
-  void *data;
-  void *context;
-  struct timer_task *next;
-};
-
-struct timer_state
-{
-  struct timer_task *timers;
-};
-
 /*
  * Task structures
 */
+struct task
+{
+  struct double_link list;
+  int priority;
+  int (*poll) (void *data);
+  void *data;
+  void *stdio;
+};
+
 struct ShellCmd
 {
   char *command;
   int (*function)(const char *command);
-};
-
-struct task
-{
-  int (*poll) (void *data);
-  void *data;
-  void *stdio;
 };
 
 /*
@@ -191,7 +188,6 @@ struct shell_state
 extern u32 LedTime;
 extern struct led_state LedState;
 extern struct shell_state Uart0State, Uart1State, ConsoleState;
-extern struct timer_state TimerState;
 extern int ScreenUp, GameUp;
 
 /*...................................................................*/
@@ -224,10 +220,6 @@ int XmodemPoll(void *data);
 void usleep(u64 microseconds);
 struct timer TimerRegister(u64 microseconds);
 u64 TimerRemaining(struct timer *tw);
-struct timer TimerSchedule(u32 usec,
-                       int (*poll) (u32 id, void *data, void *context),
-                       void *data, void *context);
-int TimerCancel(void *poll, void *data);
 u64 TimerNow(void);
 
 /*
@@ -267,7 +259,65 @@ u32 CharacterWidth();
 */
 void OsInit(void);
 void OsStart(void);
-int  TaskNew(int priority, int (*poll) (void *data), void *data);
-int  TaskEnd(int priority);
+struct task *TaskNew(int priority, int (*poll) (void *data),
+                     void *data);
+int  TaskEnd(struct task *endingTask);
+
+/*
+ * Double linked list inline functions
+*/
+// Insert after a list element
+static inline void ListInsertAfter(void *i, void *c)
+{
+  struct double_link *item = i, *current = c;
+
+  item->next = current->next;
+  item->previous = current;
+  current->next = item;
+  if (item->next)
+    item->next->previous = item;
+}
+
+// Insert before a list element
+static inline void ListInsertBefore(void *i, void *c)
+{
+  struct double_link *item = i, *current = c;
+
+  item->next = current;
+  item->previous = current->previous;
+  current->previous = item;
+  if (item->previous)
+    item->previous->next = item;
+}
+
+// Remove from a list
+static inline void ListRemove(struct double_link item)
+{
+  if (item.previous)
+  {
+    item.previous->next = item.next;
+    if (item.next)
+      item.next->previous = item.previous;
+  }
+  else if (item.next)
+    item.next->previous = NULL;
+
+  item.next = NULL;
+  item.previous = NULL;
+}
+
+// Append to the end of a list
+static inline void ListAppend(void *i, void *l)
+{
+  struct double_link *item = i, *list = l, *current;
+
+  // Loop until the end of either NULL ending and circular list
+  for (current = list; (current->next && (current->next != list));
+       current = current->next) ;
+
+  // Insert the node after the last node
+  if (current)
+    ListInsertAfter(item, current);
+}
 
 #endif /* _SYSTEM_H */

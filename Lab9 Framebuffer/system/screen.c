@@ -46,7 +46,7 @@
 /*...................................................................*/
 /* Type Definitions                                                  */
 /*...................................................................*/
-typedef struct ScreenDevice
+typedef struct
 {
   u32 initWidth;
   u32 initHeight;
@@ -55,14 +55,12 @@ typedef struct ScreenDevice
   u32 size;
   u32 width;
   u32 height;
-}
-ScreenDevice;
+} ScreenDevice;
 
 /*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
 ScreenDevice TheScreen;
-int FrameBufferIndex;
 
 /*...................................................................*/
 /* Local Static Functions                                            */
@@ -109,7 +107,7 @@ static void clear_display(ScreenDevice *screen)
 
   buffer = screen->buffer;
   size = screen->size / sizeof(ScreenColor);
-  
+
   while (size--)
     *buffer++ = COLOR_BLACK;
 }
@@ -177,7 +175,7 @@ static int screen_device_init(ScreenDevice *screen)
 
   // Polpulate the screen from the resulting framebuffer
   screen->buffer = (ScreenColor *)FrameBufferGetBuffer(
-                                                   screen->frameBuffer);
+                                                  screen->frameBuffer);
   screen->size   = FrameBufferGetSize(screen->frameBuffer);
   screen->width  = FrameBufferGetWidth(screen->frameBuffer);
   screen->height = FrameBufferGetHeight(screen->frameBuffer);

@@ -1,6 +1,6 @@
 /*...................................................................*/
 /*                                                                   */
-/*   Module:  uart0.c                                                */
+/*   Module:  16C650.c                                               */
 /*   Version: 2015.0                                                 */
 /*   Purpose: uart0 system interface for 16C650 UART                 */
 /*                                                                   */
@@ -133,8 +133,8 @@ void Uart0Init(void)
   REG32(UART_CONTROL) = 0;
 
   /* Set the baud rate. */
-#if RPI == 3
-  // RPI 3 has a 48MHz clock as it was intended to work with BT.
+#if RPI >= 3
+  // RPI 3/4 has a 48MHz clock as it was intended to work with BT.
   //(48000000 / (16 * 115200) = 26.042
   //(0.042*64)+0.5 = 3
   //115200 baud is int 26 frac 3
@@ -181,7 +181,7 @@ void Uart0Puts(const char *string)
 /*...................................................................*/
 void Uart0Putc(char character)
 {
-  unsigned int status;
+  u32 status;
 
   /* Read the UART status. */
   status = REG32(UART_STATUS);

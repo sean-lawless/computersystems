@@ -28,6 +28,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
+current_page=-1
 
 [build-menu]
 NF_00_LB=_Make

@@ -44,6 +44,8 @@
 */
 #if RPI == 1
 #define PERIPHERAL_BASE 0x20000000 /* RPi B+ */
+#elif RPI == 4
+#define PERIPHERAL_BASE 0xFE000000 /* RPi 4 */
 #else
 #define PERIPHERAL_BASE 0x3F000000 /* RPi 2/3 */
 #endif
@@ -91,6 +93,7 @@
 #define TIMER_CS        (TIMER_BASE | 0x00) // clock status
 #define TIMER_CLO       (TIMER_BASE | 0x04) // clock low 32 bytes
 #define TIMER_CHI       (TIMER_BASE | 0x08) // clock high 32 bytes
+#define T1_CLOCK_SECOND MICROS_PER_SECOND /* RPi is microseconds */
 
 // GPU memory configuration
 #if RPI == 1
@@ -102,7 +105,6 @@
 /*
  * Boot Loader interface
 */
-void SystemReboot(void);
 void _branch_to_boot(void);
 void _branch_to_run(void);
 u32  _run_size(void);

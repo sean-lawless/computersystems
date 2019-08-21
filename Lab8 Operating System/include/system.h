@@ -107,16 +107,16 @@ struct timer
 /*
  * Task structures
 */
-struct ShellCmd
-{
-  char *command;
-  int (*function)(const char *command);
-};
-
 struct task
 {
   int (*poll) (void *data);
   void *data;
+};
+
+struct ShellCmd
+{
+  char *command;
+  int (*function)(const char *command);
 };
 
 /*

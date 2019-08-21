@@ -1,7 +1,7 @@
 /*...................................................................*/
 /*                                                                   */
 /*   Module:  os.c                                                   */
-/*   Version: 2015.0                                                 */
+/*   Version: 2019.0                                                 */
 /*   Purpose: priority loop scheduler based Operating System         */
 /*                                                                   */
 /*...................................................................*/
@@ -45,14 +45,13 @@
 /*...................................................................*/
 /* Configuration                                                     */
 /*...................................................................*/
-#define USE_HIGHER_PRIORITY     TRUE /* true to increase priority  */
+#define USE_DYNAMIC_PRIORITY    TRUE /* true to increase priority  */
                                      /* until a task is available. */
 
 /*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
 struct task Tasks[MAX_TASKS];
-int TaskId;
 
 /*...................................................................*/
 /* Global Function Definitions                                       */
@@ -76,8 +75,8 @@ int TaskNew(int priority, int (*poll) (void *data), void *data)
     return -1;
   }
 
-#if USE_HIGHER_PRIORITY
-  /* Increase priority until a task is available */
+#if USE_DYNAMIC_PRIORITY
+  /* Increase (lower) priority until a task is available */
   /* if poll is NULL but data valid the task is disabled so skip */
   while ((Tasks[priority].poll != NULL) &&
          (Tasks[priority].data != NULL))
@@ -121,7 +120,6 @@ int TaskEnd(int priority)
 void OsInit(void)
 {
   bzero(Tasks, sizeof(struct task) * MAX_TASKS);
-  TaskId = 0;
 }
 
 
@@ -169,7 +167,6 @@ void OsStart(void)
   int status = TASK_IDLE;
 
   /* Execute all tasks until none remain to execute. */
-  TaskId = -1;
   for (; status != -1; )
     status = OsTick();
 }

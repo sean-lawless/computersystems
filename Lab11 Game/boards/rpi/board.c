@@ -49,17 +49,8 @@
                                   /* companion book. */
 
 /*...................................................................*/
-/* Symbol Definitions                                                */
-/*...................................................................*/
-#define T1_CLOCK_SECOND  MICROS_PER_SECOND /* RPi is microseconds */
-#define MAX_TIMER_TASKS 20
-
-/*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
-struct timer_state TimerState;
-struct timer_task TimerTasks[MAX_TIMER_TASKS];
-
 struct led_state LedState;
 u32 LedTime;
 
@@ -78,14 +69,17 @@ void BoardInit(void)
 {
   unsigned int select;
 
-  bzero(&TimerState, sizeof(struct timer_state));
-  bzero(&TimerTasks, sizeof(struct timer_task) * MAX_TIMER_TASKS);
-
+  // initialize the LED state
   bzero(&LedState, sizeof(struct led_state));
   LedTime = 0;
 
   /* Enable LED. 3 bits per GPIO so 10 GPIOs per select register. */
-#if RPI == 3
+#if RPI == 4
+  /* GPIO 42 is 2nd register in GPFSEL4, so 2 * 3 bits or bit 6. */
+  /* Clear the 3 bit range (7) starting at bit 6 */
+  select = REG32(GPFSEL4);
+  select &= ~(7 << 6);
+#elif RPI == 3
   /* GPIO 29 is select register 2, number 9. 3 bits per GPIO so 9 */
   /* Clear the 3 bit range (7) starting at bit 21 */
   select = REG32(GPFSEL2);
@@ -100,7 +94,11 @@ void BoardInit(void)
   /* 3 bits per GPIO, input (0), output (1) and alternate select */
   /* 0 through 5. */
 
-#if RPI == 3
+#if RPI == 4
+  /* Configure the LED (GPIO 42) starting at bit 6, as output (1). */
+  select |= (GPIO_OUTPUT << 6);
+  REG32(GPFSEL4) = select;
+#elif RPI == 3
   /* Configure LED (GPIO 29) starting at bit 27, as output (1). */
   select |= (GPIO_OUTPUT << 27);
   REG32(GPFSEL2) = select;
@@ -121,7 +119,10 @@ void BoardInit(void)
   /* Sleep for one hundred of a second to activate last command. */
   usleep(MICROS_PER_SECOND / 100);
 
-#if RPI == 3
+#if RPI == 4
+  /* Push GPPUD settings to GPPUDCLK1 GPIO 42. */
+  REG32(GPPUDCLK1) = (1 << (42 - 32)); /* GPIO 42 */
+#elif RPI == 3
   /* Push GPPUD settings to GPPUDCLK0 GPIO 29. */
   REG32(GPPUDCLK0) = (1 << 29); /* GPIO 29 */
 #else
@@ -279,7 +280,10 @@ void BoardInit(void)
 void LedOn(void)
 {
   /* Turn on the activity LED. */
-#if RPI == 3
+#if RPI == 4
+  /* RPI 4 has LED at GPIO 42, so set GPIO 42. */
+  REG32(GPSET1) = 1 << (42 - 32);
+#elif RPI == 3
   /* RPI 3 has LED at GPIO 29, so set GPIO 29. */
   REG32(GPSET0) = 1 << 29;
 #else
@@ -295,7 +299,10 @@ void LedOn(void)
 void LedOff(void)
 {
   /* Turn off the activity LED. */
-#if RPI == 3
+#if RPI == 4
+  /* RPI 4 has LED at GPIO 42, so clear GPIO 42. */
+  REG32(GPCLR1) = 1 << (42 - 32);
+#elif RPI == 3
   /* RPI 3 has LED at GPIO 29, so clear GPIO 29. */
   REG32(GPCLR0) = 1 << 29;
 #else
@@ -489,170 +496,6 @@ u64 TimerNow(void)
 
 #endif
 
-/*...................................................................*/
-/* TimerSchedule: Check if a registered timer has expired            */
-/*                                                                   */
-/*     Inputs: usec - expiration time in microseconds                */
-/*             poll - function to call after expiration              */
-/*             data - pointer to data structure passed to function   */
-/*             context - pointer to context structure of NULL        */
-/*                                                                   */
-/*    Returns: The created timer                                     */
-/*...................................................................*/
-struct timer TimerSchedule(u32 usec, int (*poll) (u32 id, void *data,
-                                                  void *context),
-                           void *data, void *context)
-{
-  int i;
-  struct timer tw;
-  u64 now;
-  struct timer_task *tt, *prev;
-
-  /* Retrieve the current time from the hardware clock. */
-  now = TimerNow();
-
-  /* Assign the timer timeout value. */
-  tw.expire = now + usec;
-  tw.last = now;
-
-  /* Find a free timer task */
-  for (i = 0; i < MAX_TIMER_TASKS; ++i)
-  {
-    if (TimerTasks[i].poll == NULL)
-      break;
-  }
-
-  if (i >= MAX_TIMER_TASKS)
-  {
-    tw.expire = 0;
-    tw.last = 0;
-    return tw;
-  }
-
-  /* Initialize the new timer task. */
-  tt = &TimerTasks[i];
-  tt->expire = tw;
-  tt->poll = poll;
-  tt->data = data;
-  tt->context = context;
-  tt->next = NULL;
-
-  /* Find a free timer task. */
-  for (prev = tt = TimerState.timers; tt; prev = tt, tt = tt->next)
-  {
-    /* If timer is greater for this entry, insert before here. */
-    if (tw.expire < tt->expire.expire)
-    {
-      /* Insert the new timer task in the linked list. */
-      if (prev != tt)
-      {
-        prev->next = &TimerTasks[i];
-        TimerTasks[i].next = tt;
-      }
-      else
-        TimerState.timers = tt;
-
-      /* Return success after inserting. */
-      return tw;
-    }
-  }
-
-  /* Add to the end of the list and return the created timer. */
-  if (prev)
-    prev->next = &TimerTasks[i];
-  else
-    TimerState.timers = &TimerTasks[i];
-  return tw;
-}
-
-/*...................................................................*/
-/* TimerCancel: Cancel a perviously scheduled timer                  */
-/*                                                                   */
-/*     Inputs: poll - function to call after expiration              */
-/*             data - pointer to data structure passed to function   */
-/*                                                                   */
-/*    Returns: Zero (0) on success, failure otherwise                */
-/*...................................................................*/
-int TimerCancel(void *poll, void *data)
-{
-  struct timer_state *state = &TimerState;
-  struct timer_task *current, *prev;
-
-  for (current = state->timers, prev = state->timers; current;
-       prev = current, current = current->next)
-  {
-    if ((current->poll == poll) && (current->data == data))
-    {
-      /* unlink timer task from linked list */
-      if (prev == current)
-        state->timers = current->next;
-      else
-        prev->next = current->next;
-
-      /* initialize the completed timer task for reuse */
-      bzero(current, sizeof(struct timer_task));
-      return 0;
-    }
-  }
-  return 1;
-}
-
-/*...................................................................*/
-/*  TimerPoll: Poll scheduled timers and execute any expired         */
-/*                                                                   */
-/*     Inputs: data - pointer to data structure of timer state       */
-/*                                                                   */
-/*    Returns: TASK_IDLE                                             */
-/*...................................................................*/
-int TimerPoll(void *data)
-{
-  struct timer_state *state = data;
-  struct timer_task *current;//, *prev;
-  int status;
-
-  for (current = state->timers; current; current = current->next)
-  {
-    // Check if the timer expired
-    if (TimerRemaining(&current->expire) == 0)
-    {
-      status = current->poll((u32)TimerPoll, current->data,
-                             current->context);
-      if (status == TASK_FINISHED)
-      {
-        TimerCancel(current->poll, current->data);
-
-        /* initialize the completed timer task for reuse */
-        bzero(current, sizeof(struct timer_task));
-      }
-
-      /* do not keep going, linked list may have changed */
-      return TASK_IDLE;
-    }
-
-    /* otherwise no more expired timers in ordered list so break out */
-    else
-      break;
-  }
-  return TASK_IDLE;
-}
-
-/*...................................................................*/
-/*     usleep: Wait or sleep for an amount of microseconds           */
-/*                                                                   */
-/*      Input: microseconds to sleep                                 */
-/*...................................................................*/
-void usleep(u64 microseconds)
-{
-  struct timer tw;
-
-  /* Create a timer that expires 'microseconds' from now. */
-  tw = TimerRegister(microseconds);
-
-  /* Loop checking the timer until it expires. */
-  for (;TimerRemaining(&tw) > 0;)
-    ; // Do nothing
-}
-
 #if ENABLE_SHELL
 /* from PlutoniumBob@raspi-forum */
 // Power Manager
@@ -690,3 +533,19 @@ u32 Color32(u8 red, u8 green, u8 blue, u8 alpha)
 }
 #endif
 
+/*...................................................................*/
+/*     usleep: Wait or sleep for an amount of microseconds           */
+/*                                                                   */
+/*      Input: microseconds to sleep                                 */
+/*...................................................................*/
+void usleep(u64 microseconds)
+{
+  struct timer tw;
+
+  /* Create a timer that expires 'microseconds' from now. */
+  tw = TimerRegister(microseconds);
+
+  /* Loop checking the timer until it expires. */
+  for (;TimerRemaining(&tw) > 0;)
+    ; // Do nothing
+}

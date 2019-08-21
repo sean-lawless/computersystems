@@ -1,7 +1,7 @@
 /*...................................................................*/
 /*                                                                   */
 /*   Module:  os.c                                                   */
-/*   Version: 2015.0                                                 */
+/*   Version: 2019.0                                                 */
 /*   Purpose: priority loop scheduler based Operating System         */
 /*                                                                   */
 /*...................................................................*/
@@ -52,7 +52,6 @@
 /* Global Variables                                                  */
 /*...................................................................*/
 struct task Tasks[MAX_TASKS];
-int TaskId;
 
 /*...................................................................*/
 /* Global Function Definitions                                       */
@@ -131,7 +130,6 @@ int TaskEnd(int priority)
 void OsInit(void)
 {
   bzero(Tasks, sizeof(struct task) * MAX_TASKS);
-  TaskId = 0;
 }
 
 
@@ -183,7 +181,6 @@ void OsStart(void)
   int status = TASK_IDLE;
 
   /* Execute all tasks until none remain to execute. */
-  TaskId = -1;
   for (; status != -1; )
     status = OsTick();
 }

@@ -1,7 +1,7 @@
 /*...................................................................*/
 /*                                                                   */
 /*   Module:  string.c                                               */
-/*   Version: 2015.0                                                 */
+/*   Version: 2019.0                                                 */
 /*   Purpose: String routines                                        */
 /*                                                                   */
 /*...................................................................*/
@@ -163,7 +163,7 @@ int memcmp(const void *data1, const void *data2, size_t length)
   // Return zero if equal, or index of unequal byte
   if (i == length)
     return 0;
-  else if (((u8 *)data1)[i] > ((u8 *)data1)[i])
+  else if (((u8 *)data1)[i] > ((u8 *)data2)[i])
     return i + 1; // Positive index if greater than
   else
     return -(i + 1); // Negative index if less than

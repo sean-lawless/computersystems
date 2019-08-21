@@ -77,14 +77,14 @@ LIBS =
 
 all:	app
 
-app:	$(OBJECTS)
+app:    $(OBJECTS)
 	$(LINK) -T ../../boards/rpi/memory.map -o $(APPNAME).elf $(OBJECTS) $(LIBS)
 	$(PLINK) $(APPNAME).elf -O binary $(APPNAME).bin
 	$(CP) $(APPNAME).bin kernel7.img
 
 clean:
 	rm -f $(OBJECTS)
-	rm -f *.bin
-	rm -f *.elf
-	rm -f *.img
+	rm -f $(APPNAME).bin
+	rm -f $(APPNAME).elf
+	rm -f kernel.img
 

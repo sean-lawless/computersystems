@@ -43,15 +43,9 @@
 #if ENABLE_OS
 
 /*...................................................................*/
-/* Configuration                                                     */
-/*...................................................................*/
-#define USE_DYNAMIC_PRIORITY    TRUE /* true to increase priority  */
-                                     /* until a task is available. */
-
-/*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
-struct task Tasks[MAX_TASKS];
+struct task Tasks[MAX_TASKS], *TasksStart;
 int TaskId;
 
 /*...................................................................*/
@@ -67,42 +61,70 @@ int TaskId;
 /*                                                                   */
 /*    Returns: the resulting priority or less than zero if error     */
 /*...................................................................*/
-int TaskNew(int priority, int (*poll) (void *data), void *data)
+struct task *TaskNew(int priority, int (*poll) (void *data),void *data)
 {
-  /* Return if priority greater than allowed */
-  if (priority >= MAX_TASKS)
+  int i;
+  struct task *current, *newTask;
+
+  /* Find a free task. */
+  for (i = 0; i < MAX_TASKS; ++i)
   {
-    puts("NewTask failed: priority greater than maximum.");
-    return -1;
+    if ((Tasks[i].poll == NULL) &&
+        (Tasks[i].data == NULL))
+      break;
   }
 
-#if USE_DYNAMIC_PRIORITY
-  /* Increase (lower) priority until a task is available */
-  /* if poll is NULL but data valid the task is disabled so skip */
-  while ((Tasks[priority].poll != NULL) &&
-         (Tasks[priority].data != NULL))
-  {
-    if (++priority >= MAX_TASKS)
-    {
-      puts("NewTask failed: non availble, including higher priority.");
-      return -1;
-    }
-  }
-#endif
+  /* If no tasks available, return failure. */
+  if (i >= MAX_TASKS)
+    return NULL;
+  else
+    newTask = &Tasks[i];
 
   /* Set up the task to poll and return success */
-  Tasks[priority].data = data;
-  Tasks[priority].poll = poll;
-  Tasks[priority].stdio = StdioState;
-  if (!Tasks[priority].stdio)
+  newTask->data = data;
+  newTask->poll = poll;
+  newTask->stdio = StdioState;
+  newTask->priority = priority;
+  newTask->list.next = NULL;
+  newTask->list.previous = NULL;
+  if (!newTask->stdio)
   {
 #if ENABLE_UART0
-    Tasks[priority].stdio = &Uart0State;
+    newTask->stdio = &Uart0State;
 #elif ENABLE_UART1
-    Tasks[priority].stdio = &Uart1State;
+    newTask->stdio = &Uart1State;
 #endif
   }
-  return priority;
+
+  // If task list is empty start it with this node
+  if (TasksStart == NULL)
+  {
+    TasksStart = newTask;
+    return newTask;
+  }
+
+  // Search list of tasks in priority order
+  for (current = (void *)TasksStart; current;
+       current = (void *)current->list.next)
+  {
+    /* If priority is less for this entry, insert before here. */
+    if (priority < current->priority)
+    {
+      if (current == TasksStart)
+        TasksStart = &Tasks[i];
+      ListInsertBefore(&Tasks[i], current);
+      break;
+    }
+
+    // Otherwise if this is the last node insert after here
+    else if (current->list.next == NULL)
+    {
+      ListInsertAfter(&Tasks[i], current);
+      break;
+    }
+  }
+
+  return newTask;
 }
 
 /*...................................................................*/
@@ -110,19 +132,20 @@ int TaskNew(int priority, int (*poll) (void *data), void *data)
 /*                                                                   */
 /*      Input: priority the importance of the task                   */
 /*                                                                   */
-/*    Returns: the priority or less than zero if error               */
+/*    Returns: zero on success or -1 on error                        */
 /*...................................................................*/
-int TaskEnd(int priority)
+int TaskEnd(struct task *endingTask)
 {
   /* Return if priority greater than allowed or not in use */
-  if ((priority >= MAX_TASKS) || (Tasks[priority].poll == NULL))
+  if ((endingTask == NULL) || (endingTask->poll == NULL))
     return -1;
 
   /* Remove the polling for this task and return success */
-  Tasks[priority].data = NULL;
-  Tasks[priority].poll = NULL;
-  Tasks[priority].stdio = NULL;
-  return priority;
+  endingTask->data = NULL;
+  endingTask->poll = NULL;
+  endingTask->stdio = NULL;
+  ListRemove(endingTask->list);
+  return 0;
 }
 
 /*...................................................................*/
@@ -130,6 +153,10 @@ int TaskEnd(int priority)
 /*...................................................................*/
 void OsInit(void)
 {
+  // Initilize the tasks list
+  TasksStart = NULL;
+
+  // Initialize system tasks
   bzero(Tasks, sizeof(struct task) * MAX_TASKS);
   TaskId = 0;
 }
@@ -142,23 +169,25 @@ void OsInit(void)
 /*...................................................................*/
 int OsTick(void)
 {
-  int status, taskid;
+  int status;
+  struct task *currentTask;
 
   /* Set status to invalid value to check if a task exists. */
   status = -1;
 
   /* Execute tasks in order of priority. */
-  for (taskid = 0; taskid < MAX_TASKS; taskid++)
+  for (currentTask = (void *)TasksStart; currentTask;
+       currentTask = (void *)currentTask->list.next)
   {
     /* Execute the task poll function if present. */
-    if (Tasks[taskid].poll)
+    if (currentTask->poll)
     {
       /* Set task specific stdio. */
-      if (Tasks[taskid].stdio)
-        StdioState = Tasks[taskid].stdio;
+      if (currentTask->stdio)
+        StdioState = currentTask->stdio;
 
       /* Execute the task minimally, saving state before returning. */
-      status = Tasks[taskid].poll(Tasks[taskid].data);
+      status = currentTask->poll(currentTask->data);
 
       /* If ready, break out of loop to reexecute high priority. */
       if (status == TASK_READY)
@@ -166,7 +195,7 @@ int OsTick(void)
 
       /* Stop and free this task in the list if finished. */
       if (status == TASK_FINISHED)
-        Tasks[taskid].poll = NULL;
+        currentTask->poll = NULL;
     }
 
     /* Otherwise continue to execute next priority task. */

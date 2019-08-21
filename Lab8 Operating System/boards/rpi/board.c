@@ -49,11 +49,6 @@
                                   /* companion book. */
 
 /*...................................................................*/
-/* Symbol Definitions                                                */
-/*...................................................................*/
-#define T1_CLOCK_SECOND  MICROS_PER_SECOND /* RPi is microseconds */
-
-/*...................................................................*/
 /* Global Variables                                                  */
 /*...................................................................*/
 struct led_state LedState;
@@ -74,11 +69,17 @@ void BoardInit(void)
 {
   unsigned int select;
 
+  // initialize the LED state
   bzero(&LedState, sizeof(struct led_state));
   LedTime = 0;
 
   /* Enable LED. 3 bits per GPIO so 10 GPIOs per select register. */
-#if RPI == 3
+#if RPI == 4
+  /* GPIO 42 is 2nd register in GPFSEL4, so 2 * 3 bits or bit 6. */
+  /* Clear the 3 bit range (7) starting at bit 6 */
+  select = REG32(GPFSEL4);
+  select &= ~(7 << 6);
+#elif RPI == 3
   /* GPIO 29 is select register 2, number 9. 3 bits per GPIO so 9 */
   /* Clear the 3 bit range (7) starting at bit 21 */
   select = REG32(GPFSEL2);
@@ -93,7 +94,11 @@ void BoardInit(void)
   /* 3 bits per GPIO, input (0), output (1) and alternate select */
   /* 0 through 5. */
 
-#if RPI == 3
+#if RPI == 4
+  /* Configure the LED (GPIO 42) starting at bit 6, as output (1). */
+  select |= (GPIO_OUTPUT << 6);
+  REG32(GPFSEL4) = select;
+#elif RPI == 3
   /* Configure LED (GPIO 29) starting at bit 27, as output (1). */
   select |= (GPIO_OUTPUT << 27);
   REG32(GPFSEL2) = select;
@@ -114,7 +119,10 @@ void BoardInit(void)
   /* Sleep for one hundred of a second to activate last command. */
   usleep(MICROS_PER_SECOND / 100);
 
-#if RPI == 3
+#if RPI == 4
+  /* Push GPPUD settings to GPPUDCLK1 GPIO 42. */
+  REG32(GPPUDCLK1) = (1 << (42 - 32)); /* GPIO 42 */
+#elif RPI == 3
   /* Push GPPUD settings to GPPUDCLK0 GPIO 29. */
   REG32(GPPUDCLK0) = (1 << 29); /* GPIO 29 */
 #else
@@ -241,7 +249,10 @@ void BoardInit(void)
 void LedOn(void)
 {
   /* Turn on the activity LED. */
-#if RPI == 3
+#if RPI == 4
+  /* RPI 4 has LED at GPIO 42, so set GPIO 42. */
+  REG32(GPSET1) = 1 << (42 - 32);
+#elif RPI == 3
   /* RPI 3 has LED at GPIO 29, so set GPIO 29. */
   REG32(GPSET0) = 1 << 29;
 #else
@@ -257,7 +268,10 @@ void LedOn(void)
 void LedOff(void)
 {
   /* Turn off the activity LED. */
-#if RPI == 3
+#if RPI == 4
+  /* RPI 4 has LED at GPIO 42, so clear GPIO 42. */
+  REG32(GPCLR1) = 1 << (42 - 32);
+#elif RPI == 3
   /* RPI 3 has LED at GPIO 29, so clear GPIO 29. */
   REG32(GPCLR0) = 1 << 29;
 #else

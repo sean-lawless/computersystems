@@ -60,7 +60,16 @@ int main(void)
 {
   unsigned int i, select;
 
-#if RPI == 3
+#if RPI == 4
+  /* GPIO 42 is 2nd register in GPFSEL4, so 2 * 3 bits or bit 6. */
+  /* Clear the 3 bit range (7) starting at bit 6 */
+  select = REG32(GPFSEL4);
+  select &= ~(7 << 6);
+
+  /* Configure the LED (GPIO 42) starting at bit 6, as output (1). */
+  select |= (GPIO_OUTPUT << 6);
+  REG32(GPFSEL4) = select;
+#elif RPI == 3
   /*
   ** Enable LED. 3 bits per GPIO, so 10 GPIOs per select register means
   ** GPIO 29 is select register two number 9. 3 bits per GPIO so 9
@@ -105,7 +114,10 @@ int main(void)
   for (i = 0; i < TOGGLE_LOOP_CNT / 1000; ++i)
     select = REG32(GPFSEL4);
 
-#if RPI == 3
+#if RPI == 4
+  /* Push GPPUD settings to GPPUDCLK1 GPIO 42. */
+  REG32(GPPUDCLK1) = (1 << (42 - 32)); /* GPIO 42 */
+#elif RPI == 3
   /* Push GPPUD settings to GPPUDCLK0 GPIO 29. */
   REG32(GPPUDCLK0) = (1 << 29); /* GPIO 29 */
 #else
@@ -156,7 +168,10 @@ int main(void)
   for (;;)
   {
     /* Turn on the activity LED. */
-#if RPI == 3
+#if RPI == 4
+    /* RPI 4 has LED at GPIO 42, so set GPIO 42. */
+    REG32(GPSET1) = 1 << (42 - 32);
+#elif RPI == 3
     /* RPI 3 has LED at GPIO 29, so set GPIO 29. */
     REG32(GPSET0) = 1 << 29;
 #else
@@ -169,7 +184,10 @@ int main(void)
       select = REG32(GPFSEL4);
 
     /* Turn off the activity LED. */
-#if RPI == 3
+#if RPI == 4
+    /* RPI 4 has LED at GPIO 42, so clear GPIO 42. */
+    REG32(GPCLR1) = 1 << (42 - 32);
+#elif RPI == 3
     /* RPI 3 has LED at GPIO 29, so clear GPIO 29. */
     REG32(GPCLR0) = 1 << 29;
 #else
