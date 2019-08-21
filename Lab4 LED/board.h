@@ -43,11 +43,11 @@
  * Base of peripheral memory map
 */
 #if RPI == 1
-#define PERIPHERAL_BASE 0x20000000 /* RPi B+ */
+#define RPI_BASE        0x20000000 /* RPi B+ */
 #elif RPI == 4
-#define PERIPHERAL_BASE 0xFE000000 /* RPi 4 */
+#define RPI_BASE        0xFE000000 /* RPi 4 */
 #else
-#define PERIPHERAL_BASE 0x3F000000 /* RPi 2/3 */
+#define RPI_BASE        0x3F000000 /* RPi 2/3 */
 #endif
 #define GPIO_BASE       (RPI_BASE | 0x200000)
 

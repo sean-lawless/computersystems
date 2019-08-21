@@ -176,7 +176,7 @@ void TileDisplayGrid(int locationX, int locationY)
             }
           }
 
-          // If we have circled back to start of the list then break out
+          // If we have circled back to start of list then break out
           if (stackedTile == tile)
           {
             SetPixel(x + tileX, y + tileY, COLOR_BLACK);
@@ -296,7 +296,7 @@ int TileEffectNext(EffectTile *effect)
 
   // Finally display the effect if visible
   currentTile = GameGridTile(gridX, gridY);
-  if ((isVisible) && (currentTile && (currentTile->flags & IS_VISIBLE)))
+  if ((isVisible) &&(currentTile && (currentTile->flags & IS_VISIBLE)))
   {
     // Last, display effect tile at coordinate pixels
     TileDisplayScreen((Tile *)effect, GAME_GRID_START_X +
@@ -335,7 +335,7 @@ int TileEffectNext(EffectTile *effect)
 /*...................................................................*/
 int TileEffectStart(EffectTile *effect, int newX, int newY)
 {
-  Tile *currentTile = GameGridTile(effect->locationX, effect->locationY),
+  Tile *currentTile =GameGridTile(effect->locationX,effect->locationY),
        *newTile = GameGridTile(newX, newY);
 
   // Return error if current or new location is off the game grid

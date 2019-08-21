@@ -43,7 +43,7 @@
 #if ENABLE_VIDEO
 
 // Thank you to the following sources.
-// 
+//
 // github.com/raspberrypi/firmware/wiki/Mailbox-property-interface
 // www.abbeycat.info/2017/03/06/the-raspberry-pis-vidiocore-iv/
 //

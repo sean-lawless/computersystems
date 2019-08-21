@@ -464,7 +464,7 @@ int TilePixel(u8 *tileSetData, int tileNum, u32 x, u32 y)
   u32 tilebit;
   int tileY = (tileNum * width()) / total_width();
   int tileX = ((tileNum * width()) & 0x1F) / width();
-  u8 *tileColumn = tileSetData +((tileY * height()) +y) * total_width();
+  u8 *tileColumn = tileSetData +((tileY * height()) +y) *total_width();
   u8 *tileRow = tileColumn + (tileX * width());
 
   // Ensure x and y inputs are within the valid font size

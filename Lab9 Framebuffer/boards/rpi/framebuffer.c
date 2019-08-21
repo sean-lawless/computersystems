@@ -100,7 +100,7 @@ void *FrameBufferNew(void)
 
   // 16 byte bus align the frame pointer
   frame = (void *)(((uintptr_t)&Frames[FrameIndex]) +
-                        (16 - (((uintptr_t)&Frames[FrameIndex]) & 15)));
+                       (16 - (((uintptr_t)&Frames[FrameIndex]) & 15)));
 
   // Increment frame index and return aligned frame pointer
   FrameIndex++;

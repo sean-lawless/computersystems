@@ -158,159 +158,159 @@ static void player_display(PlayerTile *character)
   int i, len;
   int high, low;
 
-    len = strlen(character->player.name);
-    for (i = 0; i < len; ++i)
-      DisplayCursorChar(character->player.name[i], i * 8, 10,
-                        COLOR_WHITE);
+  len = strlen(character->player.name);
+  for (i = 0; i < len; ++i)
+    DisplayCursorChar(character->player.name[i], i * 8, 10,
+                      COLOR_WHITE);
 
-    if (character->player.stats.flags & RACE_HUMAN)
-      display_string("Human ", 0, 30);
-    else if (character->player.stats.flags & RACE_ELF)
-      display_string(" Elf  ", 0, 30);
-    else if (character->player.stats.flags & RACE_DWARF)
-      display_string("Dwarf ", 0, 30);
-    else if (character->player.stats.flags & RACE_HOBIT)
-      display_string("Hobit ", 0, 30);
+  if (character->player.stats.flags & RACE_HUMAN)
+    display_string("Human ", 0, 30);
+  else if (character->player.stats.flags & RACE_ELF)
+    display_string(" Elf  ", 0, 30);
+  else if (character->player.stats.flags & RACE_DWARF)
+    display_string("Dwarf ", 0, 30);
+  else if (character->player.stats.flags & RACE_HOBIT)
+    display_string("Hobit ", 0, 30);
 
-    if (character->player.stats.flags & CLASS_RANGER)
-      display_string("Ranger", 48, 30);
-    else if (character->player.stats.flags & CLASS_SCOUT)
-      display_string("Scout", 48, 30);
-    else if (character->player.stats.flags & CLASS_WIZARD)
-      display_string("Wizard", 48, 30);
-    else if (character->player.stats.flags & CLASS_CLERIC)
-      display_string("Cleric", 48, 30);
+  if (character->player.stats.flags & CLASS_RANGER)
+    display_string("Ranger", 48, 30);
+  else if (character->player.stats.flags & CLASS_SCOUT)
+    display_string("Scout", 48, 30);
+  else if (character->player.stats.flags & CLASS_WIZARD)
+    display_string("Wizard", 48, 30);
+  else if (character->player.stats.flags & CLASS_CLERIC)
+    display_string("Cleric", 48, 30);
 
-    // Strength
-    display_string("S:", 0, 50);
-    high = (character->player.stats.str >> 4) & 0xF;
-    low = character->player.stats.str & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 16, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 16, 50, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 24, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 24, 50, COLOR_WHITE);
+  // Strength
+  display_string("S:", 0, 50);
+  high = (character->player.stats.str >> 4) & 0xF;
+  low = character->player.stats.str & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 16, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 16, 50, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 24, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 24, 50, COLOR_WHITE);
 
-    // Dexterity
-    display_string(" D:", 32, 50);
-    high = (character->player.stats.dex >> 4) & 0xF;
-    low = character->player.stats.dex & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 56, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 56, 50, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 64, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 64, 50, COLOR_WHITE);
+  // Dexterity
+  display_string(" D:", 32, 50);
+  high = (character->player.stats.dex >> 4) & 0xF;
+  low = character->player.stats.dex & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 56, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 56, 50, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 64, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 64, 50, COLOR_WHITE);
 
-    // Constitution
-    display_string(" C:", 72, 50);
-    high = (character->player.stats.con >> 4) & 0xF;
-    low = character->player.stats.con & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 96, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 96, 50, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 104, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 104, 50, COLOR_WHITE);
+  // Constitution
+  display_string(" C:", 72, 50);
+  high = (character->player.stats.con >> 4) & 0xF;
+  low = character->player.stats.con & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 96, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 96, 50, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 104, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 104, 50, COLOR_WHITE);
 
-    // Intellegence
-    display_string(" I:", 112, 50);
-    high = (character->player.stats.intel >> 4) & 0xF;
-    low = character->player.stats.intel & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 136, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 136, 50, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 144, 50, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 144, 50, COLOR_WHITE);
+  // Intellegence
+  display_string(" I:", 112, 50);
+  high = (character->player.stats.intel >> 4) & 0xF;
+  low = character->player.stats.intel & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 136, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 136, 50, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 144, 50, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 144, 50, COLOR_WHITE);
 
-    // Wisdom
-    display_string("W:", 0, 70);
-    high = (character->player.stats.wis >> 4) & 0xF;
-    low = character->player.stats.wis & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 16, 70, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 16, 70, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 24, 70, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 24, 70, COLOR_WHITE);
+  // Wisdom
+  display_string("W:", 0, 70);
+  high = (character->player.stats.wis >> 4) & 0xF;
+  low = character->player.stats.wis & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 16, 70, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 16, 70, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 24, 70, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 24, 70, COLOR_WHITE);
 
-    // Armour Class
-    display_string("  AC:  ", 32, 70);
-    high = (character->player.stats.ac >> 4) & 0xF;
-    low = character->player.stats.ac & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 72, 70, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 72, 70, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 80, 70, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 80, 70, COLOR_WHITE);
+  // Armour Class
+  display_string("  AC:  ", 32, 70);
+  high = (character->player.stats.ac >> 4) & 0xF;
+  low = character->player.stats.ac & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 72, 70, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 72, 70, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 80, 70, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 80, 70, COLOR_WHITE);
 
-    // Hit Points
-    display_string("HP:  ", 0, 90);
-    high = (character->player.stats.hp >> 4) & 0xF;
-    low = character->player.stats.hp & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 24, 90, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 24, 90, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 32, 90, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 32, 90, COLOR_WHITE);
+  // Hit Points
+  display_string("HP:  ", 0, 90);
+  high = (character->player.stats.hp >> 4) & 0xF;
+  low = character->player.stats.hp & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 24, 90, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 24, 90, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 32, 90, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 32, 90, COLOR_WHITE);
 
-    // eXperience Points
-    display_string(" XP:  ", 40, 90);
-    high = (character->player.currentWorld->score >> 4) & 0xF;
-    low = character->player.currentWorld->score & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 72, 90, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 72, 90, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 80, 90, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 80, 90, COLOR_WHITE);
+  // eXperience Points
+  display_string(" XP:  ", 40, 90);
+  high = (character->player.currentWorld->score >> 4) & 0xF;
+  low = character->player.currentWorld->score & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 72, 90, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 72, 90, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 80, 90, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 80, 90, COLOR_WHITE);
 
-    // Level
-    display_string(" LV:  ", 88, 90);
-    high = ((character->player.currentWorld->level) >> 4) & 0xF;
-    low = character->player.currentWorld->level & 0xF;
-    if (high <= 9)
-      DisplayCursorChar('0' + high, 120, 90, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + high - 10, 120, 90, COLOR_WHITE);
-    if (low <= 9)
-      DisplayCursorChar('0' + low, 128, 90, COLOR_WHITE);
-    else
-      DisplayCursorChar('A' + low - 10, 128, 90, COLOR_WHITE);
+  // Level
+  display_string(" LV:  ", 88, 90);
+  high = ((character->player.currentWorld->level) >> 4) & 0xF;
+  low = character->player.currentWorld->level & 0xF;
+  if (high <= 9)
+    DisplayCursorChar('0' + high, 120, 90, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + high - 10, 120, 90, COLOR_WHITE);
+  if (low <= 9)
+    DisplayCursorChar('0' + low, 128, 90, COLOR_WHITE);
+  else
+    DisplayCursorChar('A' + low - 10, 128, 90, COLOR_WHITE);
 
-    // Display Equipment
-    for (i = 0; i < character->num_items; ++i)
-    {
-      if (i < 8)
-        TileDisplayScreen((Tile *)(&character->items[i]), i * 16, 110);
-      else
-        TileDisplayScreen((Tile *)(&character->items[i]), (i - 8) * 16, 130);
-    }
+  // Display Equipment
+  for (i = 0; i < character->num_items; ++i)
+  {
+    if (i < 8)
+      TileDisplayScreen((Tile *)(&character->items[i]), i * 16, 110);
+    else
+      TileDisplayScreen((Tile *)(&character->items[i]), (i - 8) * 16, 130);
+  }
 
-    // Hardcode a seperator
-    for (i = 0; i < 21; ++i)
-      DisplayCursorChar('-', i * 8, 170, COLOR_WHITE);
-    DisplayCursorChar('|', 168, 170, COLOR_WHITE);
+  // Hardcode a seperator
+  for (i = 0; i < 21; ++i)
+    DisplayCursorChar('-', i * 8, 170, COLOR_WHITE);
+  DisplayCursorChar('|', 168, 170, COLOR_WHITE);
 }
 
 /*...................................................................*/
@@ -460,14 +460,16 @@ static int world_create_random(World *world, u32 flags)
       middleEarth[x + y * GAME_GRID_WIDTH].tileNum = random;
       middleEarth[x + y * GAME_GRID_WIDTH].flags = 0;
 #if CIRCULAR_LIST
-      middleEarth[x + y * GAME_GRID_WIDTH].list.next = &middleEarth[x + y * GAME_GRID_WIDTH].list;
-      middleEarth[x + y * GAME_GRID_WIDTH].list.previous = &middleEarth[x + y * GAME_GRID_WIDTH].list;
+      middleEarth[x + y * GAME_GRID_WIDTH].list.next =
+                            &middleEarth[x + y * GAME_GRID_WIDTH].list;
+      middleEarth[x + y * GAME_GRID_WIDTH].list.previous =
+                            &middleEarth[x + y * GAME_GRID_WIDTH].list;
 #else
       middleEarth[x + y * GAME_GRID_WIDTH].list.next = NULL;
       middleEarth[x + y * GAME_GRID_WIDTH].list.previous = NULL;
 #endif
       middleEarth[x + y * GAME_GRID_WIDTH].bitmap =
-                                                  TerrainCharactersData;
+                                                 TerrainCharactersData;
 
       // New random number and if bit zero then add reverse flag
       if (rand() & (1 << 0))
@@ -595,8 +597,7 @@ static void game_start(PlayerTile *character, SpriteTile *creatures,
       if ((roll % 100) < 50)
       {
         creatures[i].tile.color = COLOR_BROWN;
-        creatures[i].tile.flags = IS_VISIBLE | IS_CREATURE |
-                                         NO_FLIP;
+        creatures[i].tile.flags = IS_VISIBLE | IS_CREATURE | NO_FLIP;
         creatures[i].tile.tileNum = CREATURE_GIANT_BUG;
         creatures[i].stats.ac = 15;
         creatures[i].stats.hp = 9 + i;
@@ -676,7 +677,7 @@ static void game_start(PlayerTile *character, SpriteTile *creatures,
         creatures[i].stats.intel = 4;
         creatures[i].stats.con = 10;
         creatures[i].stats.wis = 3;
-        creatures[i].stats.flags = AGGRESSIVE | FLYING | VISION |AMBUSH;
+        creatures[i].stats.flags = AGGRESSIVE | FLYING | VISION|AMBUSH;
         creatures[i].name = "Manticore";
       }
       else if ((roll % 100) < 90)
@@ -730,14 +731,14 @@ static void game_start(PlayerTile *character, SpriteTile *creatures,
 
       // Check if creature can be in the mountains
       if (middleEarth[randX + randY * GAME_GRID_WIDTH].tileNum ==
-                                                      TERRAIN_MOUNTAINS)
+                                                     TERRAIN_MOUNTAINS)
       {
         if (creatures[i].tile.tileNum == CREATURE_LAND_SQUID)
           continue;
       }
 
       if (middleEarth[randX + randY * GAME_GRID_WIDTH].
-                                          tileNum == TERRAIN_WATER)
+                                              tileNum == TERRAIN_WATER)
       {
         // Sharks can only be in water
         if (creatures[i].tile.tileNum == CREATURE_SHARK)
@@ -747,10 +748,6 @@ static void game_start(PlayerTile *character, SpriteTile *creatures,
           continue;
       }
       else if (creatures[i].tile.tileNum == CREATURE_SHARK)
-        continue;
-
-      // Skip if this location already has a creature
-      if (middleEarth[randX + randY * GAME_GRID_WIDTH].list.next)
         continue;
 
       // Otherwise this location is great so start creature here
@@ -842,7 +839,7 @@ static void game_level_up(PlayerTile *characterTile)
   ScreenClear();
 
   // Reseed the PRNG
-  srand(TimerNow() ^ ('L' + characterTile->player.currentWorld->score));
+  srand(TimerNow() ^ ('L' +characterTile->player.currentWorld->score));
 
   // The portal advances levels
   if (characterTile->player.currentWorld->level < MAX_CREATURES - 1)
@@ -853,7 +850,7 @@ static void game_level_up(PlayerTile *characterTile)
   // Increase creatures per level depending on game grid size
   if (num_creatures > GAME_GRID_WIDTH)
     world_create_random(world, WORLD_WEST_COAST | WORLD_NORTH_COAST |
-              WORLD_EAST_COAST | WORLD_SOUTH_COAST | WORLD_MOUNTAINOUS);
+             WORLD_EAST_COAST | WORLD_SOUTH_COAST | WORLD_MOUNTAINOUS);
   else if (num_creatures > GAME_GRID_WIDTH -
            (GAME_GRID_WIDTH / 4))
     world_create_random(world, WORLD_NORTH_COAST | WORLD_WEST_COAST |
@@ -1001,8 +998,10 @@ static void player_create_random(PlayerTile *character, World *world)
   }
 
   // If wisdom highest, be a cleric
-  else if ((character->player.stats.wis > character->player.stats.dex)&&
-        (character->player.stats.wis > character->player.stats.intel) &&
+  else if ((character->player.stats.wis >
+            character->player.stats.dex) &&
+           (character->player.stats.wis >
+            character->player.stats.intel) &&
            (character->player.stats.wis > character->player.stats.str))
   {
     character->player.stats.flags |= CLASS_CLERIC;
@@ -1012,8 +1011,10 @@ static void player_create_random(PlayerTile *character, World *world)
   }
 
   // If dexterity highest, be a scout
-  else if ((character->player.stats.dex > character->player.stats.wis)&&
-        (character->player.stats.dex > character->player.stats.intel) &&
+  else if ((character->player.stats.dex >
+            character->player.stats.wis) &&
+           (character->player.stats.dex >
+            character->player.stats.intel) &&
            (character->player.stats.dex > character->player.stats.str))
   {
     character->player.stats.flags |= CLASS_SCOUT | TRACKING;

@@ -176,7 +176,7 @@ void TileDisplayGrid(int locationX, int locationY)
             }
           }
 
-          // If we have circled back to start of the list then break out
+          // If we have circled back to start of list then break out
           if (stackedTile == tile)
           {
             SetPixel(x + tileX, y + tileY, COLOR_BLACK);
