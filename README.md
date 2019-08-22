@@ -12,8 +12,9 @@ If you found this repository before the books, below are the references into Lea
 
 [Computer Systems Bundle](https://leanpub.com/b/computersystemscomplete)
 
-The first half of the books are available free from the links above (click the Read Free Sample button) or over the web through the links below.
+The first half of the books are available free from the links above (click Read Free Sample button), or on the web with the links below. Full screen and minimize the table of contents for best web reading.
 
 [Read Computer Systems](https://leanpub.com/computersystems/read_sample)
 
 [Read Computer Systems Lab for Raspberry Pi](https://leanpub.com/computersystems_lab_rpi/read_sample)
+
