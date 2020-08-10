@@ -38,6 +38,14 @@
 #include <system.h>
 
 /*...................................................................*/
+/* Global Function Definitions                                       */
+/*...................................................................*/
+
+// Precursor of the _start assembly function
+//   Assign default stack pointer (SP)
+asm("mov sp,#0x8000");
+
+/*...................................................................*/
 /*        main: Application Entry Point                              */
 /*                                                                   */
 /*     Returns: Exit error                                           */
