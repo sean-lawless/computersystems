@@ -18,3 +18,6 @@ The first half of the books are available free from the links above (click Read 
 
 [Read Computer Systems Lab for Raspberry Pi](https://leanpub.com/computersystems_lab_rpi/read_sample)
 
+Appendix A, using the low cost SiPeed USB to UART/JTAG adapter
+and Windows as the development PC, is available
+[here](AppendixA.md)
