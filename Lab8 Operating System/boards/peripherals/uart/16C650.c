@@ -142,6 +142,13 @@ void Uart0Init(void)
   gpio |= GPIO_ALT0 << 15;    /* set GPIO 15 to Alt 0 */
   REG32(GPFSEL1) = gpio;
 
+#if RPI == 4
+  /* UART is GPIO 14 and 15 with 2 bits per PUP GPIO */
+  gpio = REG32(GPIO_PUP_PDN_CNTRL_REG0);
+  gpio &= ~(3 << (14 * 2)); // Clear GPIO 14 value
+  gpio &= ~(3 << (15 * 2)); // Clear GPIO 15 value
+  REG32(GPIO_PUP_PDN_CNTRL_REG0) = gpio; /* commit changes */
+#else
   /*
   ** GPPUD can be 0 (disable pull up/down)
   ** (0) disable pull up and pull down to float the GPIO
@@ -149,13 +156,14 @@ void Uart0Init(void)
   ** (1 << 1) enable pull up (high)
   */
 
-  /* Disable pull up/down for next configured GPIOs so they float. */
+  /* Disable pull up/down for the next configured GPIO. */
   REG32(GPPUD) = GPPUD_OFF;
-  usleep(MICROS_PER_MILLISECOND); /* hold time */
+  usleep(MICROS_PER_MILLISECOND); /* 1ms hold time */
 
-  /* Apply above configuration (floating) to UART Rx and Tx GPIOs. */
+  /* Configure no pull up/down for Rx and Tx GPIOs. */
   REG32(GPPUDCLK0) = (1 << 14) | (1 << 15); /* GPIO 14 and 15 */
   usleep(MICROS_PER_MILLISECOND); /* hold time */
+#endif
 
   /* Set the baud rate. */
 #if RPI >= 3

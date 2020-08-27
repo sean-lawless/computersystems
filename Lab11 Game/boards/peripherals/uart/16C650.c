@@ -1,6 +1,6 @@
 /*...................................................................*/
 /*                                                                   */
-/*   Module:  uart0.c                                                */
+/*   Module:  16C650.c                                               */
 /*   Version: 2015.0                                                 */
 /*   Purpose: uart0 system interface for 16C650 UART                 */
 /*                                                                   */

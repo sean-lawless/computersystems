@@ -53,6 +53,7 @@ INCLUDES = -I. -I../../include -I../../boards/rpi \
 ##
 OBJECTS = ../../boards/rpi/app.o \
           ../../boards/rpi/board.o \
+          ../../system/timers.o \
           ../../system/string.o \
           main.o \
 

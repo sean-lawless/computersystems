@@ -42,8 +42,8 @@
 /*
  * Base of peripheral memory map
 */
-#if RPI == 1
-#define RPI_BASE        0x20000000 /* RPi B+ */
+#if RPI <= 1
+#define RPI_BASE        0x20000000 /* RPi 1A through B+ */
 #elif RPI == 4
 #define RPI_BASE        0xFE000000 /* RPi 4 */
 #else
@@ -83,3 +83,12 @@
 #define   GPPUD_PULL_UP   (1 << 1)
 #define GPPUDCLK0       (GPIO_BASE | 0x98)
 #define GPPUDCLK1       (GPIO_BASE | 0x9C)
+
+// GPIO Pull Up and Down registers (RPI 4)
+#define GPIO_PUP_PDN_CNTRL_REG0 (GPIO_BASE | 0xE4)
+#define GPIO_PUP_PDN_CNTRL_REG1 (GPIO_BASE | 0xE8)
+#define GPIO_PUP_PDN_CNTRL_REG2 (GPIO_BASE | 0xEC)
+#define GPIO_PUP_PDN_CNTRL_REG3 (GPIO_BASE | 0xF0)
+#define   GPPUP_OFF       (0 << 0)
+#define   GPPUP_PULL_UP   (1 << 0)
+#define   GPPUP_PULL_DOWN (1 << 1)

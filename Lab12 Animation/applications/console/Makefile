@@ -9,7 +9,6 @@
 ##
 CP	= cp
 RM	= rm
-LN	= ln
 C	= arm-none-eabi-gcc
 CC	= arm-none-eabi-gcc
 CPP	= arm-none-eabi-gcc

@@ -1,5 +1,5 @@
 #
-# Makefile for console application
+# Makefile for game application
 #
 #
 #
@@ -23,8 +23,10 @@ PLINK	= arm-none-eabi-objcopy
 ##
 APPNAME = game
 
-# Define the RPI hardware version: 1 is up to B+, 2 is 2, 3 is up to 3 B+
-EXTRAS = -DRPI=1 -ffreestanding
+# Define the RPI hardware version: 0 is 1A and B, 1 is B+,
+#                                  2 is 2, 3 is up to 3 B+
+#
+EXTRAS = -DRPI=3 -ffreestanding
 # Begin Historic/Depricated/Older GCC
 #RPI 3 B+
 #EXTRAS = -DRPI=3 -march=armv8-a+crc -mtune=cortex-a53 -ffreestanding
