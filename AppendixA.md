@@ -1,10 +1,10 @@
 # Appendix A
 
-The SiPeed UART/JTAG adapter is a user friendly (labeled pins,
+The SiPeed/Lichee UART/JTAG adapter is a user friendly (labeled pins,
 probe accessible, etc.), compact and low cost USB to UART/JTAG adapter.
 In my experience it was packaged with quality female to female
 GPIO wires ideal for use with debugging the RPi (ie. short).
-This USB device is based on the FTDI FT2232 part and allows
+This USB device is based on the FTDI FT2232D part and allows
 for debugging a remote RPi target systems utilizing OpenOCD and GDB.
 
 To turn a Windows PC into a bare metal RPi development PC requires
@@ -28,6 +28,61 @@ arm-none-eabi-gdb. For example:
 ```bash
 gdb-multiarch bootloader.elf
 ```
+
+## Alternate FT2232H based hardware
+
+USB to JTAG/TTL devices are discontinued frequently, and the
+SiPeed/Lichee is no exception. If you cannot get this user friendly
+part available in your area, there are alternatives. For beginners
+the SiPeed/Lichee is highly recommended due to the easy of wiring.
+
+The CJMCU-2232 FT2232HL USB to UART/JTAG is also a viable hardware
+option, although it is much less user friendly. The header pins
+typically need soldering and the pin labeling is generic and requires
+a lookup table to translate the FT2232 style (AC/AC and BC/BD) into
+JTAG and UART pins. In general use the A connectors for JTAG and
+B connectors for UART and the rest of the instructions are the same.
+A pin map from FT2232 to UART/JTAG is available online through other
+sources.
+
+The FT2232H Mini Module is also a good option and very similar to the
+CJMCU-2232 . There header is already pinned out but it requires a USB
+cable, a helpful option if short GPIO wires for JTAG are not compatible
+with your work area (laptop, etc.).
+
+The only difference relevant in our case is the location of the the
+UART pins. Below is a translation from FTDI connector pin to name.
+This reference can be used to wire either the CJMCU-2232 or FT2232H
+Mini Module.
+
+          Pin   | Name    | RPI Pin  | RPi GPIO
+----------------|---------|----------|----------
+JTAG:
+  GND:    CN2-2   GND       14         GND
+  TCK:    CN2-7   AD0       22         25
+  TDI:    CN2-10  AD1       37         26
+  TDO:    CN2-9   AD2       18         24
+  TMS:    CN2-12  AD3       13         27
+UART:
+  GND:    CN3-2   GND       6          GND
+  TX->RX: CN3-26  BD0       10         15
+  RX->TX: CN3-25  BD1       8          14
+
+Raspi to Raspi:
+      RPi Pin   | RPi GPIO  RPI Pin  | RPi GPIO
+----------------|---------|----------|----------
+  TRST:   1       3V3       15         22
+
+FTDI board to FTDI board:
+      FT Pin   | FT name | FT Pin   | FT name
+---------------|---------|----------|----------
+  VCCIO: CN2-1   V3V3       CN2-11      VIO
+  VCC:   CN3-1   VBUS       CN3-3       VCC
+
+References:
+
+[DS_FT2232H_Mini_Module.pdf](https://www.ftdichip.com/Support/Documents/DataSheets/Modules/DS_FT2232H_Mini_Module.pdf)
+[DWelch67 ARM JTAG](https://github.com/dwelch67/raspberrypi/tree/master/armjtag)
 
 ### Install MSYS2 and launch the "MSYS2 MinGW 32-bit" shell.
 
