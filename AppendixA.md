@@ -72,9 +72,8 @@ Then unzip and copy the 'contrib', 'OpenULINK' and 'scripts' folders to
 c:/msys64/mingw32/share/openocd. Replace/Update any existing files.
 
 Then copy contents of 'bin' folder to c:/msys64/mingw32/bin, again
-replacing any existing files.
-
-### Alternatively to #4 and #5 you can build the latest openocd from Git.
+replacing any existing files. Alternatively to installing and upgrading
+OpenOCD you can build the latest from Git.
 
 ### Connect all UART and JTAG pins from SiPeed to the RPI.
 
@@ -140,14 +139,15 @@ connecting with a Windows terminal software, such as TeraTerm or PuTTY.
 
 Install either Tera Term or Putty now. If you want simplicity and only
 intend to use with the RPi, choose Tera Term. For more features and
-multiple configurations/target boards, choose Putty.
+multiple configurations/target boards, choose Putty. The links
+below are to the download page on lo4d.com.
 
-[TeraTerm](https://tera-term.en.lo4d.com/windows)
+[https://tera-term.en.lo4d.com/windows](https://tera-term.en.lo4d.com/windows)
 
-[Putty](https://putty.en.lo4d.com/windows)
+[https://putty.en.lo4d.com/windows](https://putty.en.lo4d.com/windows)
 
-Now configure the terminal application to connect with the COM port
-assigned by Windows to USB Serial Converter B.
+Once installed, configure the terminal application to connect with the
+COM port assigned by Windows to USB Serial Converter B.
 
 In Tera Term, click the Setup menu and select Serial port... Then
 select the COM port from the Port: drop down list. Keep the defaults
@@ -170,10 +170,10 @@ connect.
 First half of the Laboratory. Click Read Free Sample and choose
 your preferred reading format (PDF recommended for PC reading).
 
-[Read Computer Systems Laboratory](https://leanpub.com/computersystems_lab_rpi)
+[https://leanpub.com/computersystems_lab_rpi](https://leanpub.com/computersystems_lab_rpi)
 
 Computer Systems book preview. Click Read Free Sample and choose
 your preferred reading format (PDF recommended for PC reading).
 
-[Read Computer Systems](https://leanpub.com/computersystems)
+[https://leanpub.com/computersystems](https://leanpub.com/computersystems)
 
