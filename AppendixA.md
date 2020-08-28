@@ -64,11 +64,12 @@ replacing any existing files.
 The UART Rx and Tx connect to the opposite side (Rx to Tx, Tx to Rx).
 All other pins are direct connect. Do not forget GND pins. See
 Chapter 4 for pin numbers and GPIO's. The pins on the SiPeed are
-clearly shown.
+clearly labled to avoid errors.
 
 WARNING - power off the RPi and disconnect the USB adapter before
-connecting the GPIO wires. Double check that the connections are
-correct before powering on.
+connecting the GPIO wires. Double check that each GPIO connection is
+correct and snug before powering on. A loose wire is all it takes for
+OpenOCD to fail spectacularly.
 
 ### Connect the USB SiPeed adapter to the Windows PC.
 
@@ -79,17 +80,17 @@ USB Serial Converter A and B.
 
 The USB Serial Converter A must be reconfigured to use the WinUSB
 driver in order for OpenOCD to connect and control the JTAG correctly.
-By default the FT2232 is configured by Windows to be two COM ports,
-however, it is required to replace the driver for the primary UART (A)
-with WinUSB.
+By default the FT2232 based SiPeed is configured by Windows to be two
+COM ports. However, it is required to replace the driver for the
+primary UART (A) with WinUSB before OpenOCD can use it for JTAG.
 
 To do this, download, install and execute the UsbDriverTool:
 
 [https://visualgdb.com/UsbDriverTool/](https://visualgdb.com/UsbDriverTool/)
 
-The UsbDriverTool Gui will appear, with a list of current USB devices
-on your system. Right click the USB Serial Converter A and choose
-'Install WinUSB'.
+Upon execution, the UsbDriverTool Gui will appear, with a list of
+current USB devices on your system. Right click the USB Serial
+Converter A and choose 'Install WinUSB'.
 
 ### Execute OpenOCD
 
@@ -105,11 +106,14 @@ openocd -f ../../boards/rpi/openocd_sipeed_jtag.cfg -f ../../boards/rpi/rpi4_jta
 With OpenOCD, the first configuration file is for the adapter and the
 second file is for the target board.
 
+See Chapter 4 for more details on how to connect GDB and debug
+the remote RPi target.
+
 ### UART
  
 Search the Windows Device Manager for the USB Serial Converter B and
 note the COM port number. Use this COM port number when connecting with
-TeraTerm, etc. See Chapter 6 for more details.
+TeraTerm, etc. See Chapter 6 for more details on using the UART.
 
 ### Happy coding and debugging!
   
