@@ -84,6 +84,7 @@ FTDI board to FTDI board:
 References:
 
 [DS_FT2232H_Mini_Module.pdf](https://www.ftdichip.com/Support/Documents/DataSheets/Modules/DS_FT2232H_Mini_Module.pdf)
+
 [DWelch67 ARM JTAG](https://github.com/dwelch67/raspberrypi/tree/master/armjtag)
 
 ### Install MSYS2 and launch the "MSYS2 MinGW 32-bit" shell.
