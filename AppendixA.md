@@ -169,11 +169,9 @@ connect.
 
 First half of the Laboratory. Click Read Free Sample and choose
 your preferred reading format (PDF recommended for PC reading).
-
 [https://leanpub.com/computersystems_lab_rpi](https://leanpub.com/computersystems_lab_rpi)
 
 Computer Systems book preview. Click Read Free Sample and choose
 your preferred reading format (PDF recommended for PC reading).
-
 [https://leanpub.com/computersystems](https://leanpub.com/computersystems)
 
