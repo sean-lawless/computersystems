@@ -55,6 +55,7 @@ UART pins. Below is a translation from FTDI connector pin to name.
 This reference can be used to wire either the CJMCU-2232 or FT2232H
 Mini Module.
 
+```bash
           Pin   | Name    | RPI Pin  | RPi GPIO
 ----------------|---------|----------|----------
 JTAG:
@@ -78,6 +79,7 @@ FTDI board to FTDI board:
 ---------------|---------|----------|----------
   VCCIO: CN2-1   V3V3       CN2-11      VIO
   VCC:   CN3-1   VBUS       CN3-3       VCC
+```
 
 References:
 
