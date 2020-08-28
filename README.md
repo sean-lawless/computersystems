@@ -12,12 +12,13 @@ If you found this repository before the books, below are the references into Lea
 
 [Computer Systems Bundle](https://leanpub.com/b/computersystemscomplete)
 
-The first half of the books are available free from the links above (click Read Free Sample button), or on the web with the links below. Full screen and minimize the table of contents for best web reading.
+The first half of each book is available free from the top links above.
+Click the Read Free Sample button and choose your reader format.
 
-[Read Computer Systems](https://leanpub.com/computersystems/read_sample)
+## Appendix A
 
-[Read Computer Systems Lab for Raspberry Pi](https://leanpub.com/computersystems_lab_rpi/read_sample)
+Using the low cost SiPeed USB to UART/JTAG adapter and a Windows PC as
+the development PC. This is an alternative to using a Raspbian development
+PC.
 
-Appendix A, using the low cost SiPeed USB to UART/JTAG adapter
-and Windows as the development PC, is available
-[here](AppendixA.md)
+[Appendix A: Windows Development PC](AppendixA.md)

@@ -1,16 +1,33 @@
 # Appendix A
 
-Using SiPeed low cost USB to UART/JTAG adapter. The SiPeed is a low cost
-( < $10) USB to UART/JTAG adapter. It is typically packaged with
-high quality female to female GPIO wires ideal for use with the RPi.
-This USB device is based on the FTDI FT2232 part and is thus ideal
-for use with OpenOCD and GDB.
+The SiPeed UART/JTAG adapter is a user friendly (labeled pins,
+probe accessible, etc.), compact and low cost USB to UART/JTAG adapter.
+In my experience it was packaged with quality female to female
+GPIO wires ideal for use with debugging the RPi (ie. short).
+This USB device is based on the FTDI FT2232 part and allows
+for debugging a remote RPi target systems utilizing OpenOCD and GDB.
 
 To turn a Windows PC into a bare metal RPi development PC requires
 this adapter, or a similar one, and a cross compiler for development.
-This guide describes how to install and use MSYS2 and the arm-none-eabi
-tool chain cross compiled for Windows to build, execute and debug
-the RPi.
+This guide describes how to build, execute (TTL/UART) and debug
+(JTAG) the RPi from a Windows PC, utilizing MSYS2, the arm-none-eabi
+tool chain and OpenOCD.
+
+An Ubuntu PC version of this guide is much simpler as everything
+should work out of the box with these packages installed.
+
+```bash
+sudo apt install gcc-arm-none-eabi
+sudo apt install gdb-multiarch
+sudo apt install openocd
+```
+
+When debugging on Ubuntu use gdb-multiarch instead of
+arm-none-eabi-gdb. For example:
+
+```bash
+gdb-multiarch bootloader.elf
+```
 
 ### Install MSYS2 and launch the "MSYS2 MinGW 32-bit" shell.
 
@@ -95,25 +112,68 @@ Converter A and choose 'Install WinUSB'.
 ### Execute OpenOCD
 
 Now it is time to test OpenOCD. For example, from the directory
-Lab8 Operating System\applications\bootloader, the following command
-will initialize OpenOCD for the SiPeed (FT2232) adapter and the
-connected RPi 4 target:
+Lab8 Operating System\applications\bootloader of this Git
+repository, the following command will initialize OpenOCD for the
+SiPeed (FT2232) adapter and the connected RPi 4 target:
 
 ```bash
 openocd -f ../../boards/rpi/openocd_sipeed_jtag.cfg -f ../../boards/rpi/rpi4_jtag.cfg
 ```
 
-With OpenOCD, the first configuration file is for the adapter and the
-second file is for the target board.
+This openocd_sipeed_jtag.cfg is nothing more than a copy of the interface
+configuration file openocd-usb.cfg released by OpenOCD.
 
-See Chapter 4 for more details on how to connect GDB and debug
-the remote RPi target.
+openocd/scripts/interface/ftdi/openocd-usb.cfg
+
+With OpenOCD, the first configuration file is for the adapter and the
+second file is for the target board. See Chapter 4 of the Laboratory
+book for more details on how to connect GDB to OpenOCD and debug the
+remote RPi target. This chapter (4) is included in the free preview of
+the book (link below).
+
 
 ### UART
  
 Search the Windows Device Manager for the USB Serial Converter B and
-note the COM port number. Use this COM port number when connecting with
-TeraTerm, etc. See Chapter 6 for more details on using the UART.
+note the COM port number. You will use this COM port number when
+connecting with a Windows terminal software, such as TeraTerm or PuTTY.
+
+Install either Tera Term or Putty now. If you want simplicity and only
+intend to use with the RPi, choose Tera Term. For more features and
+multiple configurations/target boards, choose Putty.
+
+[TeraTerm](https://tera-term.en.lo4d.com/windows)
+
+[Putty](https://putty.en.lo4d.com/windows)
+
+Now configure the terminal application to connect with the COM port
+assigned by Windows to USB Serial Converter B.
+
+In Tera Term, click the Setup menu and select Serial port... Then
+select the COM port from the Port: drop down list. Keep the defaults
+of 115200 baud 8N1 and press Ok. Once you have verified the UART
+connection is a success choose Setup menu and Save settup... Save the
+file as the default TERATERM.INI and this COM port will be opened
+by default every time Tera Term is launched.
+
+For PuTTY, the opening PuTTY Configuration has a Serial radio button
+on the top right side, in the Connection type: section. Select Serial
+and then enter the COM port (COM5 for example) in the Serial line
+field, and 115200 in the Speed. Press the Open button at the bottom
+to connect to the RPi over the COM port. If success you can use
+the Save button to save your configuration for quick loading next
+time you launch PuTTY; double click the saved name in the list to
+connect.
 
 ### Happy coding and debugging!
-  
+
+First half of the Laboratory. Click Read Free Sample and choose
+your preferred reading format (PDF recommended for PC reading).
+
+[Read Computer Systems Laboratory](https://leanpub.com/computersystems_lab_rpi)
+
+Computer Systems book preview. Click Read Free Sample and choose
+your preferred reading format (PDF recommended for PC reading).
+
+[Read Computer Systems](https://leanpub.com/computersystems)
+
