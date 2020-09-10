@@ -15,7 +15,7 @@ If you found this repository before the books, below are the references into Lea
 The first half of each book is available free from the top links above.
 Click the Read Free Sample button and choose your reader format.
 
-Print copies of the books and also available on Amazon.
+Print copies of the books are also available on Amazon.
 
 [Computer Systems Series](https://www.amazon.com/gp/bookseries/B08HRB1VLB)
 
