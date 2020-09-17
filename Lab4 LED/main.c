@@ -64,8 +64,6 @@ int main(void)
 {
   unsigned int i, select;
 
-//start
-
   /* Enable LED. 3 bits per GPIO so 10 GPIOs per select register. */
 #if RPI == 4
   /* GPIO 42 is 2nd register in GPFSEL4, so 2 * 3 bits or bit 6. */
@@ -141,6 +139,9 @@ int main(void)
     select = REG32(GPFSEL4);
 #endif /* RPI == 4 */
 
+  /*
+   * Enable the JTAG GPIOs
+  */
 
 #if RPI == 4
   /* 2 bits per PUP GPIO */

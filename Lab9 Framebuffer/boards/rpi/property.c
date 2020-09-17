@@ -103,7 +103,7 @@ typedef struct PropertyDisplayDimensions
   u32 vHeight;
   PropertyTag dTag; // Depth
   u32 depth;
-  PropertyTag fTag; // Framebuffer 
+  PropertyTag fTag; // Framebuffer
   u32 bufferAddr;
   u32 bufferSize;
 }
@@ -179,7 +179,7 @@ static u32 write_read(u32 channel, uintptr_t data)
 
   // Read and return mailbox result
   result = read(channel);
-  
+
   // Output error if result of read does not match write channel
   if ((result & 0x0F) != channel)
     puts("Read channel does not match write!");
@@ -204,8 +204,8 @@ static int property_get(void *property, u32 propertySize)
   u8 buffer[bufferSize + 15];
   // Adjust pointer so that it is exactly 16 byte aligned
   PropertyBuffer *propBuffer =
-                           (PropertyBuffer *)(((u32)buffer + 15) & ~15);
-                                      /* __attribute__((aligned(16))) */
+                          (PropertyBuffer *)(((u32)buffer + 15) & ~15);
+                                     /* __attribute__((aligned(16))) */
   u32 *endTag, bufferAddress;
 
   // Initialize with size, request code and copy tags
@@ -221,7 +221,7 @@ static int property_get(void *property, u32 propertySize)
   // reading back the result, which will match the write if success
   bufferAddress = GPU_MEM_BASE | (u32)propBuffer;
   if (write_read(CHANNEL_PROPERTY_TAGS_OUT, bufferAddress) !=
-                                                          bufferAddress)
+                                                         bufferAddress)
   {
     puts("write_read() failed");
     return -1;
@@ -261,13 +261,13 @@ u32 SetDisplayResolution(u32 *width, u32 *height, u32 *depth,
   dimensions.pTag.code = CODE_REQUEST;
   dimensions.pWidth = *width;
   dimensions.pHeight = *height;
-  
+
   dimensions.vTag.tagId = TAG_SET_VIRTUAL_WIDTH_HEIGHT;
   dimensions.vTag.bufSize = 8; // 4 bytes each width and height
   dimensions.vTag.code = CODE_REQUEST;
   dimensions.vWidth = *width;
   dimensions.vHeight = *height;
-  
+
   dimensions.dTag.tagId = TAG_SET_BUFFER_DEPTH;
   dimensions.dTag.bufSize = 4; // 4 bytes depth
   dimensions.dTag.code = CODE_REQUEST;
