@@ -1,5 +1,5 @@
 #
-# Makefile for console application
+# Makefile for errorcodes application
 #
 #
 #
@@ -9,7 +9,6 @@
 ##
 CP	= cp
 RM	= rm
-LN	= ln
 C	= arm-none-eabi-gcc
 CC	= arm-none-eabi-gcc
 CPP	= arm-none-eabi-gcc
@@ -21,7 +20,7 @@ PLINK	= arm-none-eabi-objcopy
 ##
 ## Definitions:
 ##
-APPNAME = console
+APPNAME = errorcodes
 
 # Define the RPI hardware version: 1 is up to B+, 2 is 2, 3 is up to 3 B+
 EXTRAS = -DRPI=3 -ffreestanding
@@ -35,9 +34,9 @@ EXTRAS = -DRPI=3 -ffreestanding
 # End Historic/Depricated/Older GCC
 
 ##Warnings about everything and optimize for size or speed (-Os or -O2)
-#CFLAGS = -Wall -O2 $(EXTRAS)
+CFLAGS = -Wall -O2 $(EXTRAS)
 ##Warnings and debugging build, with GDB and no optimizations (-O0)
-CFLAGS = -Wall -ggdb -O0 $(EXTRAS)
+#CFLAGS = -Wall -ggdb -O0 $(EXTRAS)
 
 ASFLAGS =
 ##RPI 3
@@ -50,30 +49,12 @@ INCLUDES = -I. -I../../include -I../../boards/rpi \
            -I../../boards/peripherals
 
 ##
-## Console application
+## Error code application
 ##
-
-# Use app.o for normal application, loader.o for bootloader
-#APP     = ../../boards/rpi/app.o \
-#APP     = ../../boards/rpi/loader.o \
-
-APP     = ../../boards/rpi/app.o \
+OBJECTS = ../../boards/rpi/app.o \
           ../../boards/rpi/board.o \
-          ../../boards/rpi/framebuffer.o \
-          ../../boards/rpi/property.o \
-          ../../boards/peripherals/uart/16550.o \
-          ../../boards/peripherals/uart/16C650.o \
-          ../../system/character.o \
-          ../../system/console.o \
-          ../../system/os.o \
-          ../../system/rand.o \
-          ../../system/screen.o \
           ../../system/string.o \
-          ../../system/stdio.o \
-          ../../system/shell.o \
-          ../../system/timers.o \
-          ../../system/xmodem.o \
-          main.o
+          main.o \
 
 LIBS =
 
@@ -95,16 +76,14 @@ LIBS =
 
 all:	app
 
-app:	$(APP)
-	$(LINK) -Map kernel.map -T ../../boards/rpi/memory.map -o $(APPNAME).elf \
-	        $(APP) $(LIBS)
+app:    $(OBJECTS)
+	$(LINK) -T ../../boards/rpi/memory.map -o $(APPNAME).elf $(OBJECTS) $(LIBS)
 	$(PLINK) $(APPNAME).elf -O binary $(APPNAME).bin
 	$(CP) $(APPNAME).bin kernel.img
 
 clean:
-	rm -f $(APP)
+	rm -f $(OBJECTS)
 	rm -f $(APPNAME).bin
 	rm -f $(APPNAME).elf
 	rm -f kernel.img
-	rm -f kernel.map
 
