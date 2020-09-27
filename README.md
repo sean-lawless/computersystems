@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Welcome to the repository for the book Computer Systems Incremental Systems Engineering and associated Laboratory for Raspberry Pi. This source code repository is organized by the chapters of the book, one (1) through (12). Each chapter is an accumulation of the source code created in the chapters before it.
+Welcome to the repository for the book Computer Systems Incremental Systems Engineering and associated Laboratory for Raspberry Pi. This source code repository is organized by the chapters of the book, one (1) through twelve (12). Each chapter is an accumulation of the source code created in the chapters before it.
 
 If you found this repository before the books, below are the references into Leanpub for the books. If purchasing, the bundle (last link below) is highly recommended as only the Laboratory book explains the Raspberry Pi hardware details.
 
