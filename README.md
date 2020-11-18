@@ -1,5 +1,7 @@
 # Computer Systems
 
+![image cover](./images/computer-systems-cover.png)
+
 ## Introduction
 
 Welcome to the repository for the book Computer Systems Incremental Systems Engineering and associated Laboratory for Raspberry Pi. This source code repository is organized by the chapters of the book, one (1) through (11). Each chapter is an accumulation of the source code created in the chapters before it.
@@ -13,7 +15,11 @@ If you found this repository before the books, below are the references into Lea
 [Computer Systems Bundle](https://leanpub.com/b/computersystemscomplete)
 
 The first half of each book is available free from the top links above.
-Click the Read Free Sample button and choose your reader format.
+Click the Read Free Sample button and choose your reader format. Below are
+some screenshots of using the debugger and playing the game in the
+last chapter.
+
+![image debug](./images/gdb-tui-game.png) ![image screenshot](./images/screenshot.jpg)
 
 Print copies of the books are also available on Amazon.
 
