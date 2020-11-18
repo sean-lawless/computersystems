@@ -1,6 +1,6 @@
 # Computer Systems
 
-![image cover](./images/computer-systems-cover.png)
+![image cover](./images/computer-systems-cover.jpg)
 
 ## Introduction
 
@@ -19,7 +19,7 @@ Click the Read Free Sample button and choose your reader format. Below are
 some screenshots of using the debugger and playing the game in the
 last chapter.
 
-![image debug](./images/gdb-tui-game.png) ![image screenshot](./images/screenshot.jpg)
+![image debug](./images/gdb-tui-game.jpg) ![image screenshot](./images/screenshot.jpg)
 
 Print copies of the books are also available on Amazon.
 
