@@ -1,0 +1,15 @@
+INCLUDE ../../boards/rpi/define.s
+
+MEMORY
+{
+    ram : ORIGIN = RUN_BASE_ADDR, LENGTH = BOOT_STACK_ADDR
+}
+
+SECTIONS
+{
+    .text : { *(.text*) } > ram
+    .bss : { *(.bss*) } > ram
+    .rodata : { *(.rodata*) } > ram
+    .data : { *(.data*) } > ram
+}
+
