@@ -207,13 +207,20 @@ book for more details on how to connect GDB to OpenOCD and debug the
 remote RPi target. This chapter (4) is included in the free preview of
 the book (link below).
 
-### Troubleshooting
+### Troubleshooting JTAG/OpenOCD on Win10
+
+See the Laboratory, Chapter 4 (free through Leanpub) for more
+information on using OpenOCD. Below is additional information for Win10
+users.
 
 A lot can go wrong with a JTAG device and OpenOCD. If openocd returns an
 error related to the FTDI device, be sure the SiPeed device is connected
 and the driver has been replaced. See 'Change the USB driver' section
-above. If you see two COM ports in Window Device Manager it typically
-means the driver has not been replaced. Be sure to use 
+above. If you see two (1), instead of one (1), COM ports in Win10 Device
+Manager after plug-in it typically means the driver has NOT been
+replaced with WinUSB. Also be sure to replace the driver only for the
+first or primary UART (A or 0). The secondary (B or 1) can only be used
+as a COM port.
 
 ### UART
  
