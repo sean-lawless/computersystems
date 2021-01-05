@@ -216,11 +216,13 @@ users.
 A lot can go wrong with a JTAG device and OpenOCD. If openocd returns an
 error related to the FTDI device, be sure the SiPeed device is connected
 and the driver has been replaced. See 'Change the USB driver' section
-above. If you see two (1), instead of one (1), COM ports in Win10 Device
+above. Two (2) COM ports, instead of one (1), in Win10 Device
 Manager after plug-in it typically means the driver has NOT been
-replaced with WinUSB. Also be sure to replace the driver only for the
-first or primary UART (A or 0). The secondary (B or 1) can only be used
-as a COM port.
+replaced with WinUSB. After WinUSB is installed for OpenOCD this port
+will not be usable for UART (only OpenOCD and JTAG).
+
+Also be sure to replace the driver only for the first or primary UART
+(A or 0). The secondary (B or 1) can only be used as a COM port.
 
 ### UART
  
