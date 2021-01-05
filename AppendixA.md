@@ -158,6 +158,25 @@ By default the FT2232 based SiPeed is configured by Windows to be two
 COM ports. However, it is required to replace the driver for the
 primary UART (A) with WinUSB before OpenOCD can use it for JTAG.
 
+To do this, download, install and execute the Zadig Automated Driver
+Installer (v2.5 build 730 tested):
+
+[https://zadig.akeo.ie/](https://zadig.akeo.ie/)
+
+Upon execution, the Zadig Gui will appear, with a list of
+current USB devices on your system (if not, select 'Options' menu,
+'List all devices'). Then drop down the list and select 'Dual RS232
+(Interface 0)'. Then check to be sure WinUSB is chosen as the replacement
+driver and press the 'Replace Driver' button.
+
+References
+
+[https://mindchasers.com/dev/openocd-darsena-windows](https://mindchasers.com/dev/openocd-darsena-windows)
+
+[Deprecated]
+
+The UsbDriverTool fails with latest Win10 updates when tested on 1/4/2021.
+
 To do this, download, install and execute the UsbDriverTool:
 
 [https://visualgdb.com/UsbDriverTool/](https://visualgdb.com/UsbDriverTool/)
@@ -188,6 +207,13 @@ book for more details on how to connect GDB to OpenOCD and debug the
 remote RPi target. This chapter (4) is included in the free preview of
 the book (link below).
 
+### Troubleshooting
+
+A lot can go wrong with a JTAG device and OpenOCD. If openocd returns an
+error related to the FTDI device, be sure the SiPeed device is connected
+and the driver has been replaced. See 'Change the USB driver' section
+above. If you see two COM ports in Window Device Manager it typically
+means the driver has not been replaced. Be sure to use 
 
 ### UART
  
