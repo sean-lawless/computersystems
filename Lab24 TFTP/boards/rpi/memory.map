@@ -7,9 +7,14 @@ MEMORY
 
 SECTIONS
 {
-    .text : { *(.text*) } > ram
-    .bss : { *(.bss*) } > ram
-    .rodata : { *(.rodata*) } > ram
-    .data : { *(.data*) } > ram
+  .text : { *(.text*) } > ram
+	.bss : {
+		__bss_start = .;
+		*(.bss)
+		*(.bss.*)
+    __bss_end = .;
+	} > ram
+  .rodata : { *(.rodata*) } > ram
+  .data : { *(.data*) } > ram
 }
 

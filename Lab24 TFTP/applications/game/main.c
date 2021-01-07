@@ -98,6 +98,10 @@ int UsbHostStart(char *command)
 
 #endif /* ENABLE_USB */
 
+// Defined in memory.map around BSS section
+extern u8 __bss_start[];
+extern u8 __bss_end[];
+
 /*...................................................................*/
 /*        main: Application Entry Point                              */
 /*                                                                   */
@@ -105,6 +109,10 @@ int UsbHostStart(char *command)
 /*...................................................................*/
 int main(void)
 {
+  // Zero out the BSS memory (static globals)
+  //   Could be in a pre-main function _start() instead?
+  bzero(__bss_start, __bss_end - __bss_start);
+
   // Initialize hardware peripheral configuration
   NetUp = UsbUp = ScreenUp = FALSE;
 
@@ -149,6 +157,13 @@ int main(void)
   puts("Game application");
   putu32(OgSp);
   puts(" : stack pointer");
+
+  putu32((u32)__bss_end);
+  putchar('-');
+  putu32((u32)__bss_start);
+  putchar(':');
+  putu32((__bss_end - __bss_start));
+  puts(" bytes of BSS zeroed");
 
 #if ENABLE_OS
   /* run the non-interruptive priority loop scheduler */
