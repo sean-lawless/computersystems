@@ -9,6 +9,7 @@ Welcome to the repository for the book Computer Systems Incremental Systems Engi
 Direct links to download first 6 chapters of book and lab:
 
 [Computer Systems](http://samples.leanpub.com/computersystems-sample.pdf)
+
 [Computer Systems Lab for Raspberry Pi](http://samples.leanpub.com/computersystems_lab_rpi-sample.pdf)
 
 The first half of each book is available free PDF from the top links above.
