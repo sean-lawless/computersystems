@@ -16,13 +16,13 @@ The first half of each book is available free PDF from the top links above.
 For other e-reader formats visit Leanpub and click the Read Free Sample button to
 choose your reader format.
 
-If you found this repository before the books, below are the references into Leanpub for the books. If purchasing, the bundle (last link below) is highly recommended as only the Laboratory book explains the Raspberry Pi hardware details.
+If you found this repository before the books, below are the references into Leanpub for the books. For the second half of the books the bundle (last link below) is highly recommended as only the Laboratory book explains all the Raspberry Pi hardware details.
 
 [Computer Systems on Leanpub](https://leanpub.com/computersystems)
 
 [Computer Systems Lab for Raspberry Pi on Leanpub](https://leanpub.com/computersystems_lab_rpi)
 
-[Computer Systems Bundle](https://leanpub.com/b/computersystemscomplete)
+[Computer Systems Bundle on Leanpub](https://leanpub.com/b/computersystemscomplete)
 
 Print copies of the books are also available on Amazon.
 
