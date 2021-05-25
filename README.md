@@ -6,11 +6,11 @@
 
 Welcome to the repository for the book Computer Systems Incremental Systems Engineering and associated Laboratory for Raspberry Pi. This source code repository is organized by the chapters of the book, one (1) through twelve (12). Each chapter is an accumulation of the source code created in the chapters before it.
 
-Direct links to download first 6 chapters of book and lab:
+Direct links to download PDF (or web view) the first 6 chapters of book and lab:
 
-[Computer Systems](http://samples.leanpub.com/computersystems-sample.pdf)
+[Computer Systems](http://samples.leanpub.com/computersystems-sample.pdf) [(web view)](https://leanpub.com/computersystems/read_sample)
 
-[Computer Systems Lab for Raspberry Pi](http://samples.leanpub.com/computersystems_lab_rpi-sample.pdf)
+[Computer Systems Lab for Raspberry Pi](http://samples.leanpub.com/computersystems_lab_rpi-sample.pdf) [(web view)](https://leanpub.com/computersystems_lab_rpi/read_sample)
 
 The first half of each book is available free PDF from the top links above.
 For other e-reader formats visit Leanpub and click the Read Free Sample button to
