@@ -23,7 +23,7 @@ If you found this repository before the books, below are the references into Lea
 
 Print copies of the books are also available on Amazon.
 
-[Computer Systems Series](https://www.amazon.com/gp/bookseries/B08HRB1VLB)
+[Computer Systems Series](https://www.amazon.com/dp/B0B25NW7SS)
 
 Below are some screenshots of using the debugger and playing the game in the
 last chapter.
