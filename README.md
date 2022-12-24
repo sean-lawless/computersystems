@@ -25,8 +25,9 @@ Print copies of the books are also available on Amazon.
 
 [Computer Systems Series](https://www.amazon.com/dp/B0B25NW7SS)
 
-Below are some screenshots of using the debugger and playing the game in the
-last chapter.
+Below are some live pictures of using the debugger and playing the game in the
+last chapter. These two pictures underwent artistic transformations with Gimp to
+create the book cover art above.
 
 ![image debug](./images/gdb-tui-game.jpg) ![image screenshot](./images/screenshot.jpg)
 
