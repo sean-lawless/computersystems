@@ -46,9 +46,10 @@ A pin map from FT2232 to UART/JTAG is available online through other
 sources.
 
 The FT2232H Mini Module is also a good option and very similar to the
-CJMCU-2232 . There header is already pinned out but it requires a USB
-cable, a helpful option if short GPIO wires for JTAG are not compatible
-with your work area (laptop, etc.).
+CJMCU-2232 . The header is already pinned out but does not include a USB
+cable. But a longer cable is a helpful option if moving between different
+boards or if the short GPIO wires for JTAG are not long enough for your
+work area.
 
 The only difference relevant in our case is the location of the the
 UART pins. Below is a translation from FTDI connector pin to name.
@@ -102,7 +103,7 @@ pacman -S make
 
 [https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 
-### Add path to c:/msys64/etc/profile
+### Add installed toolchain to the MSYS2 path
 
 Add the directory to the toolchain from #2 to MSYS path.
 
@@ -116,7 +117,7 @@ MSYS2_PATH="/usr/local/bin:/usr/bin:/bin:/c/Program Files (x86)/GNU Arm Embedded
 pacman -S mingw-w64-i686-openocd
 ```
 
-Unfortunately this version of OpenOCD is too dated to support the RPi
+Unfortunately this version of OpenOCD may be too dated to support the RPi
 hardware. Proceed to the next step to upgrade the OpenOCD.
 
 ### Upgrade OpenOCD
@@ -131,7 +132,7 @@ c:/msys64/mingw32/share/openocd. Replace/Update any existing files.
 
 Then copy contents of 'bin' folder to c:/msys64/mingw32/bin, again
 replacing any existing files. Alternatively to installing and upgrading
-OpenOCD you can build the latest from Git.
+OpenOCD you can build the latest from Git (not for the faint of heart).
 
 ### Connect all UART and JTAG pins from SiPeed to the RPI.
 
@@ -143,12 +144,15 @@ clearly labled to avoid errors.
 WARNING - power off the RPi and disconnect the USB adapter before
 connecting the GPIO wires. Double check that each GPIO connection is
 correct and snug before powering on. A loose wire is all it takes for
-OpenOCD to fail spectacularly.
+OpenOCD to fail spectacularly. Never connect a SiPeed wire to any
+RPi 3V power pin as it can fry the adapter.
 
 ### Connect the USB SiPeed adapter to the Windows PC.
 
 This should produce two new devices within the Device Manager,
-USB Serial Converter A and B.
+USB Serial Converter A and B. This step can be performed before
+connecting the wires/pins in the step above, but both must be
+performed before starting OpenOCD in the next section.
 
 ### Change the USB driver
 
