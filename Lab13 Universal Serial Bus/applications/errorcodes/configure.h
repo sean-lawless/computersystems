@@ -69,7 +69,6 @@
 
 /* USB Specific configuration */
 #define ENABLE_USB_HID     (TRUE & ENABLE_USB) /* for keyboard/mouse */
-#define ENABLE_USB_TASK    (FALSE & ENABLE_USB)/* task for interrupts */
 
 /* Derived configuration; DO NOT EDIT BELOW */
 

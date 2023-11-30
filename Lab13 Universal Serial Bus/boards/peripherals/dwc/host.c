@@ -107,8 +107,10 @@
 #define   RST_CTL_AHB_IDLE       (1 << 31)
 #define INT_STS                (USB_BASE + 0x014) // Interrupt status
 #define   INT_STS_SOF_INTR       (1 << 3)  // soft interrupt
+#define   INT_STS_USB_SUSPEND    (1 << 11) // suspend interrupt
+#define   INT_STS_USB_RESET      (1 << 12) // reset interrupt
 #define   INT_STS_PORT_INTR      (1 << 24) // port interrupt
-#define   INT_STS_HC_INTR        (1 << 25) // Host interrupt
+#define   INT_STS_HC_INTR        (1 << 25) // host interrupt
 #define INT_MSK                (USB_BASE + 0x018) // Interrupt Mask
 #define   INT_MSK_MODE_MISMATCH  (1 << 1)
 #define   INT_MSK_SOF_INTR       (1 << 3)
@@ -290,7 +292,8 @@ static void enable_host_interrupt(Host *host)
   clear_host_interrupt(host);
 
   mask = REG32(INT_MSK);
-  mask |= INT_MSK_HC_INTR | INT_MSK_PORT_INTR | INT_MSK_DISCONNECT;
+  mask |= INT_MSK_HC_INTR | INT_MSK_PORT_INTR | INT_MSK_DISCONNECT |
+          INT_MSK_SOF_INTR | INT_MSK_USB_RESET;
 
   REG32(INT_MSK) = mask;
 }
@@ -455,11 +458,7 @@ static int initialize_host(Host *hostController)
 /*                                                                   */
 /*    Returns: TASK_FINISHED if rescheduled or TASK_IDLE if a task   */
 /*...................................................................*/
-#if ENABLE_USB_TASK
-static int process_interrupt(void *param)
-#else
 static int process_interrupt(u32 unused, void *param, void *context)
-#endif
 {
   Host *host = (Host *)param;
   unsigned channel = 0;
@@ -490,22 +489,31 @@ static int process_interrupt(u32 unused, void *param, void *context)
       channelMask <<= 1;
     }
   }
-  else if ((status & INT_STS_PORT_INTR) && (oldStatus != status))
+  if ((status & INT_STS_USB_RESET) && (oldStatus != status))
+  {
+    printf("USB reset interrupt %x\n", status);
+  }
+  if ((status & INT_STS_USB_SUSPEND) && (oldStatus != status))
+  {
+    printf("USB suspend interrupt %x\n", status);
+  }
+  if ((status & INT_STS_SOF_INTR) && (oldStatus != status))
+  {
+    printf("USB soft interrupt %x\n", status);
+  }
+  if ((status & INT_STS_PORT_INTR) && (oldStatus != status))
   {
     printf("USB port interrupt %x\n", status);
-    oldStatus = status;
   }
 
   // Acknowledge all previously processed interrupts
   REG32(INT_STS) = status;
+  oldStatus = status;
 
-#if !ENABLE_USB_TASK
   /* Schedule interrupt handler for next USB frame (125us). */
-  TimerSchedule(125, process_interrupt, (void *)host, 0);
+  if (!unused)
+    TimerSchedule(125, process_interrupt, (void *)host, 0);
   return TASK_FINISHED;
-#else
-  return TASK_IDLE;
-#endif
 }
 
 /*...................................................................*/
@@ -549,7 +557,6 @@ int HostGetPortSpeed(void)
 /*...................................................................*/
 int HostEnable(void)
 {
-  u32 config;
   Host *host;
 
   bzero(&HostController, sizeof(Host));
@@ -559,7 +566,8 @@ int HostEnable(void)
   host = &HostController;
   assert(host != 0);
 
-  puts("Turn on USB power...");
+  puts("Initialize the DesignWare Host Controller () Host.");
+  puts("  Turn on USB power...");
   if (SetUsbPowerStateOn())
   {
     puts("Set of USB HCD power bit failed");
@@ -567,12 +575,11 @@ int HostEnable(void)
     return FALSE;
   }
 
-  /* Disable all interrupts by clearing the global interrupt mask. */
-  config = REG32(AHB_CFG);
-  config &= ~GLOBAL_INT_ENABLE;
-  REG32(AHB_CFG) = config;
+  puts("  Enable global interrupts.");
+  enable_global_interrupt(host);
 
-  puts("Initialize the DesignWare Host Controller () Host.");
+  process_interrupt(TRUE, host, 0);
+
   puts("  Initialize core.");
   if (!initialize_core(host))
   {
@@ -581,8 +588,7 @@ int HostEnable(void)
     return FALSE;
   }
 
-  puts("  Enable global interrupts.");
-  enable_global_interrupt(host);
+  process_interrupt(TRUE, host, 0);
 
   puts("  Initialize host.");
   if (!initialize_host(host))
@@ -593,13 +599,9 @@ int HostEnable(void)
   }
 
   // Create task or timer to monitor the interrupts
-  puts("  Begin interrupt handling.");
-#if ENABLE_USB_TASK
-  TaskNew(2, process_interrupt, (void *)host);
-#else
+  puts("  Schedule interrupt handler.");
   TimerSchedule(MICROS_PER_MILLISECOND, process_interrupt,
                 (void *)host, 0);
-#endif
 
   return TRUE;
 }
