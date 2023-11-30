@@ -581,7 +581,7 @@ void SystemReboot(void)
 /*             blue - the 8 bit blue component of the color          */
 /*             alpha - the 8 bit intensity of the color              */
 /*                                                                   */
-/*    Returns: Zero (0) or current time if unexpired                 */
+/*    Returns: 32 bit ARGB color for RPI                             */
 /*...................................................................*/
 u32 Color32(u8 red, u8 green, u8 blue, u8 alpha)
 {

@@ -42,8 +42,6 @@
 /* Configuration                                                     */
 /*...................................................................*/
 #define ENABLE_OS          TRUE
-#define   MAX_TASKS          (10 + ENABLE_UART0 + ENABLE_UART1 + \
-                              ENABLE_VIDEO)
 #define ENABLE_SHELL       TRUE
 #define ENABLE_UART0       TRUE  /* enable primary UART */
 #define ENABLE_UART1       FALSE /* enable secondary UART */
@@ -71,10 +69,8 @@
 #define ENABLE_USB_TASK    (FALSE && ENABLE_USB) /* USB intr task */
 
 /* Network configuration */
-#define ENABLE_IP4         (TRUE && \  /* Inet Protocol v4 */
-                            ENABLE_MALLOC && ENABLE_ETHER)
-#define ENABLE_IP6         (FALSE && \ /* Inet Protocol v6 */
-                            ENABLE_MALLOC && ENABLE_ETHER)
+#define ENABLE_IP4         (TRUE && ENABLE_MALLOC && ENABLE_ETHER) /* Inet Protocol v4 */
+#define ENABLE_IP6         (FALSE && ENABLE_MALLOC && ENABLE_ETHER) /* Inet Protocol v6 */
 #define ENABLE_UDP         (TRUE && (ENABLE_IP4 || ENABLE_IP4))/* UDP */
 #define ENABLE_TCP         (FALSE && (ENABLE_IP4 || ENABLE_IP4))/* TCP*/
 #define ENABLE_DHCP        (TRUE && ENABLE_UDP)/* Dynamic IP Discovery*/
