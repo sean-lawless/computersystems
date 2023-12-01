@@ -169,8 +169,6 @@
 typedef enum
 {
   StageStateNoSplitTransfer,
-  StageStateStartSplit,
-  StageStateCompleteSplit,
   StageStatePeriodicDelay,
   StageStateUnknown
 }
@@ -745,16 +743,6 @@ static void start_transaction(Host *host, TransferStageData *stageData)
 
   // Set split control
   size = 0;
-  if (stageData->splitTransaction)
-  {
-    size |= ((Device *)stageData->device)->hubPortNumber;
-    size |= ((Device *)stageData->device)->hubAddress <<
-                                HC_SPLT_HUB_ADDR_OFFSET;
-    size |= HC_SPLT_XACT_POS_ALL << HC_SPLT_XACT_POS_OFFSET;
-    if (stageData->splitComplete)
-      size |= HC_SPLT_COMP_SPLT;
-    size |= HC_SPLT_SPLT_ENA;
-  }
   REG32(HC_SPLT(channel)) = size;
 
   // set channel parameters
@@ -846,60 +834,13 @@ static int transfer_stage_async(Host *host, void *urb, int in,
   host->stageData[channel] = stageData;
   enable_channel_interrupt(host, channel);
 
-  // If no split then start at no split stage of transfer
-  if (!stageData->splitTransaction)
-  {
-    stageData->state = StageStateNoSplitTransfer;
-  }
-
-  // Otherwise start at the split transaction stage
-  else
-  {
-    stageData->state = StageStateStartSplit;
-    stageData->splitComplete = FALSE;
-
-    assert(stageData->frameScheduler != 0);
-    stageData->frameScheduler->startSplit(stageData->frameScheduler);
-  }
+  // No split stage of transfer only for now
+  stageData->state = StageStateNoSplitTransfer;
 
   // Begin the host transaction
   start_transaction(host, stageData);
 
   return TRUE;
-}
-
-/*...................................................................*/
-/* stage_interval: start a periodic transfer                         */
-/*                                                                   */
-/*      Input: host is the USB host                                  */
-/*             urb is the USB Request Buffer (URB)                   */
-/*             in is TRUE if inbound, FALSE if outbound              */
-/*             statusStage is the stage of the transaction           */
-/*                                                                   */
-/*    Returns: TASK_FINISHED to indicate completion                  */
-/*...................................................................*/
-static int stage_interval(u32 tmr, void *param, void *context)
-{
-  Host *host = (Host *)context;
-  TransferStageData *stageData = (TransferStageData *)param;
-
-  assert(host != 0);
-  assert(stageData != 0);
-  assert(stageData->state == StageStatePeriodicDelay);
-
-  if (stageData->splitTransaction)
-  {
-    stageData->state = StageStateStartSplit;
-
-    stageData->splitComplete = FALSE;
-    assert(stageData->frameScheduler != 0);
-    stageData->frameScheduler->startSplit(stageData->frameScheduler);
-  }
-  else
-    stageData->state = StageStateNoSplitTransfer;
-
-  start_transaction(host, stageData);
-  return TASK_FINISHED;
 }
 
 /*...................................................................*/
@@ -910,12 +851,11 @@ static int stage_interval(u32 tmr, void *param, void *context)
 /*...................................................................*/
 static void process_channel_interrupt(Host *host, u32 channel)
 {
-  u32 interval, status;
+  u32 /*interval,*/ status;
   assert(host != 0);
 
   TransferStageData *stageData = host->stageData[channel];
   assert(stageData != 0);
-  FrameScheduler *frameScheduler = stageData->frameScheduler;
   Request *urb = stageData->urb;
   assert (urb != 0);
   assert(channel < MAX_CHANNELS);
@@ -933,10 +873,6 @@ static void process_channel_interrupt(Host *host, u32 channel)
         start_transaction(host, stageData);
         return;
       }
-
-      assert(!TransferStageDataIsPeriodic(stageData) ||
-        (HC_T_SIZ_PID(REG32(HC_T_SIZ(channel)))
-         != HC_T_SIZ_PID_MDATA));
 
       TransferStageDataTransactionComplete (stageData,
         REG32(HC_INT(channel)),
@@ -959,16 +895,6 @@ static void process_channel_interrupt(Host *host, u32 channel)
         printf("No split Transaction failed (status 0x%X)\n", status);
         urb->status = status;
       }
-      else if ((status & (HC_INT_NAK | HC_INT_NYET))
-         && TransferStageDataIsPeriodic(stageData))
-      {
-        stageData->state = StageStatePeriodicDelay;
-
-        interval = urb->endpoint->interval;
-        TimerSchedule(interval * MICROS_PER_MILLISECOND, stage_interval,
-                      stageData, host);
-        break;
-      }
       else
       {
         // Read data during data stage
@@ -988,108 +914,6 @@ static void process_channel_interrupt(Host *host, u32 channel)
         RequestCallCompletionRoutine(urb);
       break;
 
-    case StageStateStartSplit:
-      status = stageData->transactionStatus;
-      if ((status & HC_INT_ERROR_MASK) ||
-          (status & HC_INT_NAK) ||
-          (status & HC_INT_NYET))
-      {
-        puts("StartSplit Transaction failed");
-
-        urb->status = 0;
-
-        disable_channel_interrupt(host, channel);
-
-        TransferStageDataRelease(stageData);
-        free_stage_data(stageData);
-        host->stageData[channel] = 0;
-
-        free_channel(host, channel);
-
-        RequestCallCompletionRoutine(urb);
-        break;
-      }
-
-      frameScheduler->transactionComplete(frameScheduler, status);
-
-      stageData->state = StageStateCompleteSplit;
-      stageData->splitComplete = TRUE;
-
-      if (!frameScheduler->completeSplit(frameScheduler))
-      {
-        goto LeaveCompleteSplit;
-      }
-
-      start_transaction(host, stageData);
-      break;
-
-    case StageStateCompleteSplit:
-      status = stageData->transactionStatus;
-      if (status & HC_INT_ERROR_MASK)
-      {
-        puts("Complete split Transaction failed");
-
-        urb->status = 0;
-
-        disable_channel_interrupt(host, channel);
-
-        TransferStageDataRelease(stageData);
-        free_stage_data(stageData);
-        host->stageData[channel] = 0;
-
-        free_channel(host, channel);
-
-        RequestCallCompletionRoutine(urb);
-        break;
-      }
-
-      frameScheduler->transactionComplete(frameScheduler, status);
-
-      if (frameScheduler->completeSplit(frameScheduler))
-      {
-        start_transaction(host, stageData);
-        break;
-      }
-
-    LeaveCompleteSplit:
-      if (stageData->packets != 0)
-      {
-        if (!TransferStageDataIsPeriodic(stageData))
-        {
-          stageData->state = StageStateStartSplit;
-          stageData->splitComplete = FALSE;
-
-          frameScheduler->startSplit(frameScheduler);
-
-          start_transaction(host, stageData);
-        }
-        else
-        {
-          stageData->state = StageStatePeriodicDelay;
-
-          interval = urb->endpoint->interval;
-          TimerSchedule(interval * MICROS_PER_MILLISECOND,
-                        stage_interval, stageData, host);
-        }
-        break;
-      }
-
-      disable_channel_interrupt(host, channel);
-
-      if (!stageData->statusStage)
-        urb->resultLen = TransferStageDataGetResultLen(stageData);
-
-      urb->status = 1;
-
-      TransferStageDataRelease(stageData);
-      free_stage_data(stageData);
-      host->stageData[channel] = 0;
-
-      free_channel(host, channel);
-
-      RequestCallCompletionRoutine(urb);
-      break;
-
     default:
       assert (0);
       break;
@@ -1103,11 +927,7 @@ static void process_channel_interrupt(Host *host, u32 channel)
 /*                                                                   */
 /*    Returns: TASK_FINISHED if rescheduled or TASK_IDLE if a task   */
 /*...................................................................*/
-#if ENABLE_USB_TASK
-static int process_interrupt(void *param)
-#else
 static int process_interrupt(u32 unused, void *param, void *context)
-#endif
 {
   Host *host = (Host *)param;
   unsigned channel = 0;
@@ -1139,13 +959,9 @@ static int process_interrupt(u32 unused, void *param, void *context)
   // Acknowledge all previously processed interrupts
   REG32(INT_STS) = status;
 
-#if !ENABLE_USB_TASK
   /* Schedule interrupt handler for next USB frame (125us). */
   TimerSchedule(125, process_interrupt, (void *)host, 0);
   return TASK_FINISHED;
-#else
-  return TASK_IDLE;
-#endif
 }
 
 /*...................................................................*/
@@ -1251,12 +1067,8 @@ int HostEnable(void)
 
   // Create task or timer to monitor the interrupts
   puts("  Begin interrupt handling.");
-#if ENABLE_USB_TASK
-  TaskNew(2, process_interrupt, (void *)host);
-#else
   TimerSchedule(MICROS_PER_MILLISECOND, process_interrupt,
                 (void *)host, 0);
-#endif
 
   return TRUE;
 }
@@ -1397,7 +1209,6 @@ int HostEndpointControlMessage(void *vhost, void *endpoint,
   setup->index        = index;
   setup->length       = dataSize;
   RequestAttach(urb, endpoint, data, dataSize, setup);
-
 
   if (complete)
     RequestSetCompletionRoutine(urb, complete, param, host);

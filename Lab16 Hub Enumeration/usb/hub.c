@@ -213,8 +213,8 @@ begin:
     if (hub->init_state == hub->ports)
     {
       /* After powering port, delay by PwrOn2PwrGood in milliseconds */
-//      printf("Power on 2 power good delay = %d\n",
-//             hub->hubDesc->pwrOn2PwrGood);
+      printf("Power on 2 power good delay = %d\n",
+             hub->hubDesc->pwrOn2PwrGood);
 
       // Ignore the power delay, use half second USB maximum delay
       usleep(MICROS_PER_SECOND/ 2);
@@ -224,11 +224,11 @@ begin:
 
     if (nPort < hub->ports)
     {
-//      printf("In: port = %d, state = %d\n", nPort, hub->init_state);
+      printf("In: port = %d, state = %d\n", nPort, hub->init_state);
 
       if ((hub->init_state - hub->ports) % 4 == STATE_ENUM_GET_STATUS)
       {
-//        printf("In: if ((hub->init_state - hub->ports) rem 4 == 0), port = %d\n", nPort);
+        printf("In: if ((hub->init_state - hub->ports) rem 4 == 0), port = %d\n", nPort);
         // now detect devices, reset and initialize them
         assert (hub->status[nPort] == 0);
         hub->status[nPort] = &(hub->Status[nPort]);
@@ -247,7 +247,7 @@ begin:
       else if ((hub->init_state - hub->ports) % 4 ==
                                                   STATE_ENUM_PORT_RESET)
       {
-//        printf("In: if ((hub->init_state - hub->ports) rem 4 == 1), port = %d\n", nPort);
+        printf("In: if ((hub->init_state - hub->ports) rem 4 == 1), port = %d\n", nPort);
         assert (hub->status[nPort]->status & PORT_POWER_MASK);
 
         if (HostEndpointControlMessage(hub->device.host, endpoint0,
@@ -264,7 +264,7 @@ begin:
       else if ((hub->init_state - hub->ports) % 4 ==
                                                  STATE_ENUM_PORT_STATUS)
       {
-//        printf("In: if ((hub->init_state - hub->ports) rem 4 == 2), port = %d\n", nPort);
+        printf("In: if ((hub->init_state - hub->ports) rem 4 == 2), port = %d\n", nPort);
 
         usleep(MICROS_PER_MILLISECOND * 200);
 
@@ -282,7 +282,7 @@ begin:
       {
         Speed speed = SpeedUnknown;
 
-//        puts("In: else if ((HubInitState - hub->ports)) % 4 == 3");
+        puts("In: else if ((HubInitState - hub->ports)) % 4 == 3");
         usleep(MICROS_PER_MILLISECOND * 200);
         if (!(hub->status[nPort]->status & PORT_CONNECTION_MASK))
         {
@@ -343,8 +343,7 @@ begin:
       // which is required.
       nPort = hub->ports - 1 - nPort;
 
-//      printf("In: port = %d, state = %d\n", nPort, hub->init_state);
-//      puts("In: else if (hub->init_state > (hub->ports + 1) * 4)");
+      printf("In: port = %d, state = %d\n", nPort, hub->init_state);
       if ((nPort >= 0) && (nPort < hub->ports))
       {
         Device *child;
@@ -464,7 +463,7 @@ static void configure_complete(void *urb, void *param, void *context)
   assert (hub->hubDesc != 0);
   assert (hub->device.host != 0);
 
-//  printf("configure_complete state %d\n", hub->init_state);
+  printf("configure_complete state %d\n", hub->init_state);
 
   if ((hub->init_state == STATE_SET_INTERFACE) &&
       (interfaceDesc->alternateSetting != 0))

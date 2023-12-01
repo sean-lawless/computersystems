@@ -55,7 +55,6 @@
 #define _DEVICE_H_
 
 #include <usb/usb.h>
-//#include <usb/endpoint.h>
 #include <string.h>
 #include <system.h>
 

@@ -25,7 +25,7 @@ APPNAME = console
 
 # Define the RPI hardware version: 1 is up to B+, 2 is 2, 3 is up to 3 B+
 # For TCP/IP debugging define -DLWIP_DEBUG
-EXTRAS = -DRPI=1 -ffreestanding
+EXTRAS = -DRPI=3 -ffreestanding
 # Begin Historic/Depricated/Older GCC
 #RPI 3 B+
 #EXTRAS = -DRPI=3 -march=armv8-a+crc -mtune=cortex-a53 -ffreestanding

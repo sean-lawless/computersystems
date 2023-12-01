@@ -62,11 +62,8 @@
 #define ENABLE_ASSERT      (TRUE && ENABLE_PRINTF)/*enable assertions */
 #define ENABLE_AUTO_START  FALSE /* Auto start enabled devices */
 
-/* USB Specific configuration */
-#define ENABLE_USB_TASK    (FALSE && ENABLE_USB) /* USB intr task */
-
 /* DO NOT EDIT BELOW : Derived configurations */
 #define MAX_TASKS          (10 + ENABLE_UART0 + ENABLE_UART1 + \
-                            ENABLE_VIDEO + ENABLE_USB_TASK)
+                            ENABLE_VIDEO)
 
 #endif /* _CONFIGURE_H */

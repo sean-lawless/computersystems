@@ -301,6 +301,10 @@ void BoardInit(void)
 #endif
 #endif /* ENABLE_UART1 */
 
+#if ENABLE_XMODEM
+  XmodemInit();
+#endif
+
 #if ENABLE_SHELL
   ShellInit();
 #endif

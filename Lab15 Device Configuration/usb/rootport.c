@@ -88,10 +88,6 @@ HostRootPort RootPort;
 /*...................................................................*/
 /* External function prototypes                                      */
 /*...................................................................*/
-extern void *HubAttach(Device *hub);
-extern void HubRelease(Device *hub);
-extern void *KeyboardAttach(Device *keyboard);
-extern void KeyboardRelease(Device *keyboard);
 
 /*...................................................................*/
 /* Static Local Functions                                            */

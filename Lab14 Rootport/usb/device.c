@@ -66,9 +66,6 @@
 /*...................................................................*/
 #define STATE_GET_DESCRIPTOR_LENGTH     0
 #define STATE_GET_DESCRIPTOR            1
-#define STATE_SET_ENDPOINT_ADDRESS      2
-#define STATE_GET_CONFIGURATION_LENGTH  3
-#define STATE_GET_CONFIGURATION         4
 
 /*...................................................................*/
 /* Global Variables                                                  */
@@ -282,7 +279,7 @@ void DeviceInitialize(void *urb, void *param, void *context)
     if (HostGetEndpointDescriptor(device->host, device->endpoint0,
               DESCRIPTOR_DEVICE, INDEX_DEFAULT,
               device->deviceDesc, sizeof(*device->deviceDesc),
-              REQUEST_IN, DeviceInitialize, device) <= 0)
+              REQUEST_IN, initialize_complete, device) <= 0)
     {
       puts("Cannot get device descriptor");
       device->deviceDesc = 0;
@@ -290,25 +287,6 @@ void DeviceInitialize(void *urb, void *param, void *context)
       return;
     }
 
-    //increase state
-    device->state = STATE_SET_ENDPOINT_ADDRESS;
-  }
-  else if (device->state == STATE_SET_ENDPOINT_ADDRESS)
-  {
-    if (nextAddress > MAX_ADDRESS)
-    {
-      puts("Too many devices");
-      device->state = 0;
-      return;
-    }
-
-    if (!HostSetEndpointAddress(device->host, device->endpoint0,
-                                nextAddress, initialize_complete, device))
-    {
-      puts("Cannot set address");
-      device->state = STATE_GET_DESCRIPTOR_LENGTH;
-      return;
-    }
     device->state = STATE_GET_DESCRIPTOR_LENGTH; //reset state
   }
 }

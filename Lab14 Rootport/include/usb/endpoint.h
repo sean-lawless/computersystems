@@ -86,12 +86,9 @@ typedef struct Endpoint
 /* Function Prototypes                                               */
 /*...................................................................*/
 void EndpointControl(Endpoint *endpoint, struct Device *device);
-void EndpointFromDescr(Endpoint *endpoint, struct Device *device,
-                       const EndpointDescriptor *desc);
 void EndpointRelease(Endpoint *endpoint);
 void EndpointCopy(Endpoint *dst, Endpoint *src, struct Device *device);
 PID EndpointGetNextPID(Endpoint *endpoint, int statusStage);
 void EndpointSkipPID(Endpoint *endpoint, u32 packets, int statusStage);
-void EndpointResetPID(Endpoint *endpoint);
 
 #endif

@@ -49,34 +49,6 @@
 extern int OgSp;
 int ScreenUp, UsbUp;
 
-#if ENABLE_USB_HID
-
-static char KeyIn;
-
-unsigned int usbKbdCheck(void)
-{
-  return KeyIn;
-}
-
-char usbKbdGetc(void)
-{
-  char key = KeyIn;
-
-  KeyIn = 0;
-  return key;
-}
-
-void KeyPressedHandler(const char ascii)
-{
-  KeyIn = ascii;
-
-  /* If interactive console is not up yet, output to UART. */
-  if (ConsoleState.getc == NULL)
-    Uart0State.putc(ascii);
-}
-
-#endif /* ENABLE_USB_HID */
-
 #if ENABLE_USB
 int UsbHostStart(char *command)
 {

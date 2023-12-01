@@ -58,10 +58,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include <usb/request.h>
 #include <usb/device.h>
 #include "dwhc.h"
-//#include "transfer.h"
 
 /*...................................................................*/
 /* Configuration                                                     */
@@ -201,7 +199,7 @@ static void host_attach(Host *host)
 
   host->channels = 0;
   host->channelAllocated = 0;
-  host->rootPort = 0;//RootPortAttach(host);
+  host->rootPort = 0;
 
   for (channel = 0; channel < MAX_CHANNELS; channel++)
   {
@@ -217,7 +215,6 @@ static void host_attach(Host *host)
 /*...................................................................*/
 static void host_release(Host *host)
 {
-//  RootPortRelease(host->rootPort);
 }
 
 /*...................................................................*/
@@ -483,7 +480,6 @@ static int process_interrupt(u32 unused, void *param, void *context)
       {
         REG32(HC_INT_MSK(channel)) = 0;
         printf("Channel interrupt %d\n", channel);
-// todo:      process_channel_interrupt(host, channel);
       }
 
       channelMask <<= 1;

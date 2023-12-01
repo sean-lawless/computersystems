@@ -501,6 +501,7 @@ void DeviceInitialize(void *urb, void *param, void *context)
       return;
     }
 
+    // Save the descriptor maximum packet size
     device->endpoint0->maxPacketSize =
                                      device->deviceDesc->maxPacketSize;
 

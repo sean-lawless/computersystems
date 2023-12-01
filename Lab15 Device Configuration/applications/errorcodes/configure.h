@@ -44,8 +44,6 @@
 /* Configuration                                                     */
 /*...................................................................*/
 #define ENABLE_OS          FALSE
-#define   MAX_TASKS          (10 + ENABLE_UART0 + ENABLE_UART1 + \
-                              ENABLE_VIDEO)
 #define ENABLE_SHELL       FALSE
 #define ENABLE_UART0       FALSE /* enable primary UART */
 #define ENABLE_UART1       FALSE /* enable secondary UART */
@@ -67,11 +65,9 @@
 #define ENABLE_PRINTF      FALSE /* enable printf arguments */
 #define ENABLE_ASSERT      FALSE /* enable assertions */
 
-/* USB Specific configuration */
-#define ENABLE_USB_HID     (TRUE & ENABLE_USB) /* for keyboard/mouse */
-#define ENABLE_USB_TASK    (FALSE & ENABLE_USB)/* task for interrupts */
-
-/* Derived configuration; DO NOT EDIT BELOW */
+/* DO NOT EDIT BELOW : Derived configurations */
+#define MAX_TASKS          (10 + ENABLE_UART0 + ENABLE_UART1 + \
+                            ENABLE_VIDEO)
 
 
 #endif /* _CONFIGURE_H */

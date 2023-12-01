@@ -82,79 +82,6 @@ void EndpointControl(Endpoint *endpoint, Device *device)
 }
 
 /*...................................................................*/
-/* EndpointFromDescr: Initialize an endpoint based on a descriptor   */
-/*                                                                   */
-/*      Inputs: endpoint is the endpoint to initialize               */
-/*              device is the owner of the control endpoint          */
-/*              desc is the descriptor of the endpoint               */
-/*...................................................................*/
-void EndpointFromDescr(Endpoint *endpoint, Device *device,
-                       const EndpointDescriptor *desc)
-{
-  u8 interval;
-
-  assert(endpoint != 0);
-  endpoint->device = device;
-  endpoint->interval = 1;
-
-  assert(endpoint->device != 0);
-  assert(desc != 0);
-  assert(desc->length == sizeof *desc);
-  assert(desc->descriptorType == DESCRIPTOR_ENDPOINT);
-
-  switch (desc->attributes & 0x03)
-  {
-    case 2:
-      endpoint->type = EndpointTypeBulk;
-      endpoint->nextPID = PIDData0;
-      break;
-
-    case 3:
-      endpoint->type = EndpointTypeInterrupt;
-      endpoint->nextPID = PIDData0;
-      break;
-
-    default:
-      assert(0); // endpoint type not supported
-      return;
-  }
-
-  endpoint->number = desc->endpointAddress & 0x0F;
-  endpoint->directionIn = desc->endpointAddress & 0x80 ? TRUE : FALSE;
-  endpoint->maxPacketSize = ((desc->maxPacketSize2 << 8) +
-                             desc->maxPacketSize);
-
-  if (endpoint->type == EndpointTypeInterrupt)
-  {
-    interval = desc->interval;
-    if (interval < 1)
-      interval = 1;
-
-    // USB 2.0 specification chapter 9.6.6
-    if (endpoint->device->speed != SpeedHigh)
-    {
-      endpoint->interval = interval;
-    }
-    else
-    {
-      u32 value;
-
-      // Trim interval if it exceeds maximum
-      if (interval > 16)
-        interval = 16;
-
-      // Calculate value of interval and assign to endpoint
-      value = 1 << (interval - 1);
-      endpoint->interval = value / 8;
-
-      // If result is less than zero, set to one (1)
-      if (endpoint->interval < 1)
-        endpoint->interval = 1;
-    }
-  }
-}
-
-/*...................................................................*/
 /* EndpointCopy: Copy one endpoint configuration to another          */
 /*                                                                   */
 /*      Inputs: dst is the destination (copy to) endpoint            */
@@ -248,19 +175,6 @@ void EndpointSkipPID(Endpoint *endpoint, u32 packets, int statusStage)
     assert(endpoint->type == EndpointTypeControl);
     endpoint->nextPID = PIDSetup;
   }
-}
-
-/*...................................................................*/
-/* EndpointResetPID: Reset the PID for an endpoint                   */
-/*                                                                   */
-/*      Inputs: endpoint is the endpoint to retrieve PID for         */
-/*...................................................................*/
-void EndpointResetPID(Endpoint *endpoint)
-{
-  assert(endpoint != 0);
-  assert(endpoint->type == EndpointTypeBulk);
-
-  endpoint->nextPID = PIDData0;
 }
 
 #endif /* ENABLE_USB */

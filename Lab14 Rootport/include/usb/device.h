@@ -85,39 +85,21 @@ typedef union
   EndpointDescriptor Ep;
 } __attribute__((packed)) Descriptor;
 
-/*
-typedef struct ConfigurationParser
-{
-  const Descriptor *buffer;
-  unsigned bufLen;
-  int valid;
-  const void *endPosition;
-  const Descriptor *currentPosition;
-}
-ConfigurationParser;
-*/
 
 typedef struct Device
 {
   struct Host *host;
   struct Endpoint *endpoint0;
   DeviceDescriptor *deviceDesc;
-//  ConfigurationDescriptor *configDesc;
-//  ConfigurationParser *configParser;
 
   // Declare and leave space for device configuration
   struct Endpoint Endpoint0;
   DeviceDescriptor DeviceDesc;
   u8 dev_descr_pad[16]; // Add padding to 16 byte align DeviceDesc
-//  ConfigurationDescriptor ConfigDesc;
-//  u8 config_descr_pad[MAX_CONFIG_DESC_SIZE + 16]; // Pad to 16 bytes
-//  ConfigurationParser ConfigParser;
 
   // Asynchronous configuration state machine variables
   void *comp_dev;
   void (*complete)(void *urb, void *param, void *context);
-//  int (*configure)(struct Device *device, void (complete)
-//              (void *urb, void *param, void *context), void *param);
   int state;
 
   // Device configuration details
@@ -138,9 +120,5 @@ Device *DeviceCreate(Device *parent);
 void DeviceInit(void);
 void DeviceCopy(Device *to, Device *from);
 void DeviceInitialize(void *urb, void *param, void *context);
-//int DeviceConfigure (Device *device, void (complete)
-//              (void *urb, void *param, void *context), void *param);
-//const Descriptor *DeviceGetDescriptor(ConfigurationParser *parser,
-//                                      u8 type);
 
 #endif

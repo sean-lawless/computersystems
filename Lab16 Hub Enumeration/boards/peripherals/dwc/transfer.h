@@ -128,7 +128,6 @@ typedef struct TransferStageData
 
   FrameScheduler *frameScheduler;
   union {
-    FrameSchedulerPeriodic periodic;
     FrameSchedulerNonPeriodic nonperiodic;
     FrameSchedulerNoSplit nosplit;
   } FrameScheduler;

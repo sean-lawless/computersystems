@@ -40,47 +40,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <usb/request.h>
 #include <usb/device.h>
 
 extern int OgSp;
 
 int ScreenUp, GameUp, UsbUp, NetUp;
 
-#if ENABLE_USB_HID
-
-static char KeyIn;
-
-unsigned int usbKbdCheck(void)
-{
-  return KeyIn;
-}
-
-char usbKbdGetc(void)
-{
-  char key = KeyIn;
-
-  KeyIn = 0;
-  return key;
-}
-
-void KeyPressedHandler(const char ascii)
-{
-  KeyIn = ascii;
-
-  /* If interactive console is not up yet, output to UART. */
-  if (ConsoleState.getc == NULL)
-    Uart0State.putc(ascii);
-}
-
-#endif /* ENABLE_USB_HID */
-
 #if ENABLE_USB
 int UsbHostStart(char *command)
 {
   if (!UsbUp)
   {
-    RequestInit();
     DeviceInit();
 
     if (!HostEnable())

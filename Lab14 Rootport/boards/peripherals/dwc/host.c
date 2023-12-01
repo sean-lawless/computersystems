@@ -107,8 +107,10 @@
 #define   RST_CTL_AHB_IDLE       (1 << 31)
 #define INT_STS                (USB_BASE + 0x014) // Interrupt status
 #define   INT_STS_SOF_INTR       (1 << 3)  // soft interrupt
+#define   INT_STS_USB_SUSPEND    (1 << 11) // suspend interrupt
+#define   INT_STS_USB_RESET      (1 << 12) // reset interrupt
 #define   INT_STS_PORT_INTR      (1 << 24) // port interrupt
-#define   INT_STS_HC_INTR        (1 << 25) // Host interrupt
+#define   INT_STS_HC_INTR        (1 << 25) // host interrupt
 #define INT_MSK                (USB_BASE + 0x018) // Interrupt Mask
 #define   INT_MSK_MODE_MISMATCH  (1 << 1)
 #define   INT_MSK_SOF_INTR       (1 << 3)
@@ -169,8 +171,6 @@
 typedef enum
 {
   StageStateNoSplitTransfer,
-  StageStateStartSplit,
-  StageStateCompleteSplit,
   StageStatePeriodicDelay,
   StageStateUnknown
 }
@@ -745,16 +745,6 @@ static void start_transaction(Host *host, TransferStageData *stageData)
 
   // Set split control
   size = 0;
-  if (stageData->splitTransaction)
-  {
-    size |= ((Device *)stageData->device)->hubPortNumber;
-    size |= ((Device *)stageData->device)->hubAddress <<
-                                HC_SPLT_HUB_ADDR_OFFSET;
-    size |= HC_SPLT_XACT_POS_ALL << HC_SPLT_XACT_POS_OFFSET;
-    if (stageData->splitComplete)
-      size |= HC_SPLT_COMP_SPLT;
-    size |= HC_SPLT_SPLT_ENA;
-  }
   REG32(HC_SPLT(channel)) = size;
 
   // set channel parameters
@@ -846,60 +836,13 @@ static int transfer_stage_async(Host *host, void *urb, int in,
   host->stageData[channel] = stageData;
   enable_channel_interrupt(host, channel);
 
-  // If no split then start at no split stage of transfer
-  if (!stageData->splitTransaction)
-  {
-    stageData->state = StageStateNoSplitTransfer;
-  }
-
-  // Otherwise start at the split transaction stage
-  else
-  {
-    stageData->state = StageStateStartSplit;
-    stageData->splitComplete = FALSE;
-
-    assert(stageData->frameScheduler != 0);
-    stageData->frameScheduler->startSplit(stageData->frameScheduler);
-  }
+  // No split stage of transfer only for now
+  stageData->state = StageStateNoSplitTransfer;
 
   // Begin the host transaction
   start_transaction(host, stageData);
 
   return TRUE;
-}
-
-/*...................................................................*/
-/* stage_interval: start a periodic transfer                         */
-/*                                                                   */
-/*      Input: host is the USB host                                  */
-/*             urb is the USB Request Buffer (URB)                   */
-/*             in is TRUE if inbound, FALSE if outbound              */
-/*             statusStage is the stage of the transaction           */
-/*                                                                   */
-/*    Returns: TASK_FINISHED to indicate completion                  */
-/*...................................................................*/
-static int stage_interval(u32 tmr, void *param, void *context)
-{
-  Host *host = (Host *)context;
-  TransferStageData *stageData = (TransferStageData *)param;
-
-  assert(host != 0);
-  assert(stageData != 0);
-  assert(stageData->state == StageStatePeriodicDelay);
-
-  if (stageData->splitTransaction)
-  {
-    stageData->state = StageStateStartSplit;
-
-    stageData->splitComplete = FALSE;
-    assert(stageData->frameScheduler != 0);
-    stageData->frameScheduler->startSplit(stageData->frameScheduler);
-  }
-  else
-    stageData->state = StageStateNoSplitTransfer;
-
-  start_transaction(host, stageData);
-  return TASK_FINISHED;
 }
 
 /*...................................................................*/
@@ -910,12 +853,11 @@ static int stage_interval(u32 tmr, void *param, void *context)
 /*...................................................................*/
 static void process_channel_interrupt(Host *host, u32 channel)
 {
-  u32 interval, status;
+  u32 /*interval,*/ status;
   assert(host != 0);
 
   TransferStageData *stageData = host->stageData[channel];
   assert(stageData != 0);
-  FrameScheduler *frameScheduler = stageData->frameScheduler;
   Request *urb = stageData->urb;
   assert (urb != 0);
   assert(channel < MAX_CHANNELS);
@@ -933,10 +875,6 @@ static void process_channel_interrupt(Host *host, u32 channel)
         start_transaction(host, stageData);
         return;
       }
-
-      assert(!TransferStageDataIsPeriodic(stageData) ||
-        (HC_T_SIZ_PID(REG32(HC_T_SIZ(channel)))
-         != HC_T_SIZ_PID_MDATA));
 
       TransferStageDataTransactionComplete (stageData,
         REG32(HC_INT(channel)),
@@ -959,16 +897,6 @@ static void process_channel_interrupt(Host *host, u32 channel)
         printf("No split Transaction failed (status 0x%X)\n", status);
         urb->status = status;
       }
-      else if ((status & (HC_INT_NAK | HC_INT_NYET))
-         && TransferStageDataIsPeriodic(stageData))
-      {
-        stageData->state = StageStatePeriodicDelay;
-
-        interval = urb->endpoint->interval;
-        TimerSchedule(interval * MICROS_PER_MILLISECOND, stage_interval,
-                      stageData, host);
-        break;
-      }
       else
       {
         // Read data during data stage
@@ -988,108 +916,6 @@ static void process_channel_interrupt(Host *host, u32 channel)
         RequestCallCompletionRoutine(urb);
       break;
 
-    case StageStateStartSplit:
-      status = stageData->transactionStatus;
-      if ((status & HC_INT_ERROR_MASK) ||
-          (status & HC_INT_NAK) ||
-          (status & HC_INT_NYET))
-      {
-        puts("StartSplit Transaction failed");
-
-        urb->status = 0;
-
-        disable_channel_interrupt(host, channel);
-
-        TransferStageDataRelease(stageData);
-        free_stage_data(stageData);
-        host->stageData[channel] = 0;
-
-        free_channel(host, channel);
-
-        RequestCallCompletionRoutine(urb);
-        break;
-      }
-
-      frameScheduler->transactionComplete(frameScheduler, status);
-
-      stageData->state = StageStateCompleteSplit;
-      stageData->splitComplete = TRUE;
-
-      if (!frameScheduler->completeSplit(frameScheduler))
-      {
-        goto LeaveCompleteSplit;
-      }
-
-      start_transaction(host, stageData);
-      break;
-
-    case StageStateCompleteSplit:
-      status = stageData->transactionStatus;
-      if (status & HC_INT_ERROR_MASK)
-      {
-        puts("Complete split Transaction failed");
-
-        urb->status = 0;
-
-        disable_channel_interrupt(host, channel);
-
-        TransferStageDataRelease(stageData);
-        free_stage_data(stageData);
-        host->stageData[channel] = 0;
-
-        free_channel(host, channel);
-
-        RequestCallCompletionRoutine(urb);
-        break;
-      }
-
-      frameScheduler->transactionComplete(frameScheduler, status);
-
-      if (frameScheduler->completeSplit(frameScheduler))
-      {
-        start_transaction(host, stageData);
-        break;
-      }
-
-    LeaveCompleteSplit:
-      if (stageData->packets != 0)
-      {
-        if (!TransferStageDataIsPeriodic(stageData))
-        {
-          stageData->state = StageStateStartSplit;
-          stageData->splitComplete = FALSE;
-
-          frameScheduler->startSplit(frameScheduler);
-
-          start_transaction(host, stageData);
-        }
-        else
-        {
-          stageData->state = StageStatePeriodicDelay;
-
-          interval = urb->endpoint->interval;
-          TimerSchedule(interval * MICROS_PER_MILLISECOND,
-                        stage_interval, stageData, host);
-        }
-        break;
-      }
-
-      disable_channel_interrupt(host, channel);
-
-      if (!stageData->statusStage)
-        urb->resultLen = TransferStageDataGetResultLen(stageData);
-
-      urb->status = 1;
-
-      TransferStageDataRelease(stageData);
-      free_stage_data(stageData);
-      host->stageData[channel] = 0;
-
-      free_channel(host, channel);
-
-      RequestCallCompletionRoutine(urb);
-      break;
-
     default:
       assert (0);
       break;
@@ -1103,11 +929,7 @@ static void process_channel_interrupt(Host *host, u32 channel)
 /*                                                                   */
 /*    Returns: TASK_FINISHED if rescheduled or TASK_IDLE if a task   */
 /*...................................................................*/
-#if ENABLE_USB_TASK
-static int process_interrupt(void *param)
-#else
 static int process_interrupt(u32 unused, void *param, void *context)
-#endif
 {
   Host *host = (Host *)param;
   unsigned channel = 0;
@@ -1119,7 +941,7 @@ static int process_interrupt(u32 unused, void *param, void *context)
   status = REG32(INT_STS);
 
   // Process only host controller interrupts
-  if (REG32(INT_STS) & INT_STS_HC_INTR)
+  if (status & INT_STS_HC_INTR)
   {
     u32 channelMask = 1;
 
@@ -1139,13 +961,9 @@ static int process_interrupt(u32 unused, void *param, void *context)
   // Acknowledge all previously processed interrupts
   REG32(INT_STS) = status;
 
-#if !ENABLE_USB_TASK
   /* Schedule interrupt handler for next USB frame (125us). */
   TimerSchedule(125, process_interrupt, (void *)host, 0);
   return TASK_FINISHED;
-#else
-  return TASK_IDLE;
-#endif
 }
 
 /*...................................................................*/
@@ -1251,12 +1069,8 @@ int HostEnable(void)
 
   // Create task or timer to monitor the interrupts
   puts("  Begin interrupt handling.");
-#if ENABLE_USB_TASK
-  TaskNew(2, process_interrupt, (void *)host);
-#else
   TimerSchedule(MICROS_PER_MILLISECOND, process_interrupt,
                 (void *)host, 0);
-#endif
 
   return TRUE;
 }
@@ -1302,32 +1116,6 @@ int HostGetEndpointDescriptor(void *host, void *endpoint, u8 type,
           requestType, GET_DESCRIPTOR,
           (type << 8) | index, 0,
           buffer, bufSize, complete, param);
-}
-
-/*...................................................................*/
-/* HostSetEndpointAddress: set the endpoint address to use           */
-/*                                                                   */
-/*      Input: host is the USB host                                  */
-/*             endpoint is the device endpoint                       */
-/*             deviceAddress is the address to set                   */
-/*             complete is callback function invoked upon completion */
-/*             param is the pointer to pass to the complete callback */
-/*                                                                   */
-/*    Returns: TRUE on success, FALSE if error                       */
-/*...................................................................*/
-int HostSetEndpointAddress(void *host, void *endpoint,
-      u8 deviceAddress, void (complete)(void *urb, void *param,
-                                        void *context), void *param)
-{
-  assert(host != 0);
-
-  if (HostEndpointControlMessage(host, endpoint, REQUEST_OUT,
-             SET_ADDRESS, deviceAddress, 0, 0, 0, complete, param) < 0)
-    return FALSE;
-
-  //USB 2.0 set address max delay is defined as 150 ms
-  usleep(150 * MICROS_PER_MILLISECOND);
-  return TRUE;
 }
 
 /*...................................................................*/
@@ -1437,59 +1225,7 @@ void HostSubmitAsyncRequest(void *request, void *dev, void *context)
     }
     else
     {
-      if (urb->zlb || ((state == 0) &&
-                        (urb->bufLen == 0)))
-      {
-        if (state == 0)
-        {
-          /* save the previous registered completion callback */
-          urb->savedRoutine = urb->completionRoutine;
-          urb->savedParam   = urb->completionParam;
-          urb->savedContext = urb->completionContext;
-          urb->zlb = 1;
-
-          RequestSetCompletionRoutine(urb,
-                      HostSubmitAsyncRequest, host, (void *)1);
-
-          transfer_stage_async(host, urb, FALSE, FALSE);
-        }
-        else if (state == 1)
-        {
-          RequestSetCompletionRoutine(urb,
-            urb->savedRoutine, urb->savedParam,
-            urb->savedContext);
-          transfer_stage_async(host, urb, TRUE, TRUE);
-        }
-      }
-      else
-      {
-        if (state == 0)
-        {
-          /* save the previous registered completion callback */
-          urb->savedRoutine = urb->completionRoutine;
-          urb->savedParam   = urb->completionParam;
-          urb->savedContext = urb->completionContext;
-          urb->zlb = 0;
-
-          RequestSetCompletionRoutine(urb,
-                      HostSubmitAsyncRequest, host, (void *)1);
-
-          transfer_stage_async(host, urb, FALSE, FALSE);
-        }
-        else if (state == 1)
-        {
-          RequestSetCompletionRoutine(urb,
-                       HostSubmitAsyncRequest, host, (void *)2);
-          transfer_stage_async(host, urb, FALSE, FALSE);
-        }
-        else if (state == 2)
-        {
-          RequestSetCompletionRoutine(urb,
-            urb->savedRoutine, urb->savedParam,
-            urb->savedContext);
-          transfer_stage_async(host, urb, TRUE, TRUE);
-        }
-      }
+      printf("requestType %d not supported\n", setup->requestType);
     }
   }
   else

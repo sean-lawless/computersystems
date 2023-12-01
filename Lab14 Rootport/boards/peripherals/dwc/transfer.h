@@ -63,8 +63,6 @@
 typedef struct FrameScheduler
 {
   void (*frameSchedulerRelease)(struct FrameScheduler *scheduler);
-  void (*startSplit)(struct FrameScheduler *scheduler);
-  int (*completeSplit)(struct FrameScheduler *scheduler);
   void (*transactionComplete)(struct FrameScheduler *scheduler,
                               u32 status);
   void (*waitForFrame)(struct FrameScheduler *scheduler);
@@ -104,9 +102,6 @@ typedef struct TransferStageData
   int in;
   int statusStage;
 
-  int splitTransaction;
-  int splitComplete;
-
   void *device;
   void *endpoint;
   Speed speed;
@@ -128,8 +123,6 @@ typedef struct TransferStageData
 
   FrameScheduler *frameScheduler;
   union {
-    FrameSchedulerPeriodic periodic;
-    FrameSchedulerNonPeriodic nonperiodic;
     FrameSchedulerNoSplit nosplit;
   } FrameScheduler;
 } TransferStageData;

@@ -313,184 +313,8 @@ static int nosplit_is_odd_frame(FrameScheduler *base)
 }
 
 /*...................................................................*/
-/* periodic_release: release a periodic frame scheduler              */
-/*                                                                   */
-/*      Input: base is a pointer to the frame scheduler              */
-/*...................................................................*/
-static void periodic_release(FrameScheduler *base)
-{
-  FrameSchedulerPeriodic *scheduler = (FrameSchedulerPeriodic *) base;
-  assert (scheduler != 0);
-
-  scheduler->state = StateUnknown;
-}
-
-/*...................................................................*/
-/* periodic_start_split: start a periodic split                      */
-/*                                                                   */
-/*      Input: base is a pointer to the frame scheduler              */
-/*...................................................................*/
-static void periodic_start_split(FrameScheduler *base)
-{
-  FrameSchedulerPeriodic *scheduler = (FrameSchedulerPeriodic *) base;
-  assert (scheduler != 0);
-
-  scheduler->state = StartSplit;
-  scheduler->nextFrame = FRAME_PERIODIC_MAX;
-}
-
-/*...................................................................*/
-/* periodic_complete_split: Complete a periodic split transaction    */
-/*                                                                   */
-/*      Input: base is a pointer to the frame scheduler              */
-/*                                                                   */
-/*    Returns: TRUE if sucess, FALSE if error                        */
-/*...................................................................*/
-static int periodic_complete_split(FrameScheduler *base)
-{
-  FrameSchedulerPeriodic *scheduler = (FrameSchedulerPeriodic *)base;
-  assert (scheduler != 0);
-
-  switch (scheduler->state)
-  {
-    case StartSplitComplete:
-      scheduler->state = CompleteSplit;
-      scheduler->tries = scheduler->nextFrame != 5 ? 3 : 2;
-      scheduler->nextFrame = (scheduler->nextFrame  + 2) & 7;
-      return TRUE;
-
-    case CompleteRetry:
-      scheduler->nextFrame = (scheduler->nextFrame + 1) & 7;
-      return TRUE;
-      break;
-
-    case CompleteSplitComplete:
-    case CompleteSplitFailed:
-      break;
-
-    default:
-      assert (0);
-      break;
-  }
-
-  return FALSE;
-}
-
-/*...................................................................*/
-/* periodic_transaction_complete: Complete a periodic transaction    */
-/*                                                                   */
-/*      Input: base is a pointer to the frame scheduler              */
-/*             status is the completion status for the transaction   */
-/*...................................................................*/
-static void periodic_transaction_complete(FrameScheduler *base,
-                                          u32 status)
-{
-  FrameSchedulerPeriodic *scheduler = (FrameSchedulerPeriodic *)base;
-  assert(scheduler != 0);
-
-  switch(scheduler->state)
-  {
-    case StartSplit:
-      assert (status & HC_INT_ACK);
-      scheduler->state = StartSplitComplete;
-      break;
-
-    case CompleteSplit:
-    case CompleteRetry:
-      if (status & HC_INT_XFER_COMP)
-      {
-        scheduler->state = CompleteSplitComplete;
-      }
-      else if (status & (HC_INT_NYET | HC_INT_ACK))
-      {
-        if (scheduler->tries-- == 0)
-        {
-          scheduler->state = CompleteSplitFailed;
-        }
-        else
-        {
-          scheduler->state = CompleteRetry;
-        }
-      }
-      else if (status & HC_INT_NAK)
-      {
-        scheduler->state = CompleteSplitFailed;
-      }
-      else
-        puts("Invalid status");
-      break;
-
-    default:
-      assert (0);
-      break;
-  }
-}
-
-/*...................................................................*/
-/* periodic_wait_for_frame: wait for periodic transaction            */
-/*                                                                   */
-/*      Input: base is a pointer to the frame scheduler              */
-/*...................................................................*/
-static void periodic_wait_for_frame(FrameScheduler *base)
-{
-  FrameSchedulerPeriodic *scheduler = (FrameSchedulerPeriodic *) base;
-  assert (scheduler != 0);
-
-  if (scheduler->nextFrame == FRAME_PERIODIC_MAX)
-  {
-    scheduler->nextFrame = (HFNUM_NUMBER(REG32(HFNUM)) + 1) & 7;
-    if (scheduler->nextFrame == 6)
-    {
-      scheduler->nextFrame++;
-    }
-  }
-
-  while ((HFNUM_NUMBER(REG32(HFNUM)) & 7) != scheduler->nextFrame)
-  {
-    // do nothing
-  }
-}
-
-/*...................................................................*/
-/* periodic_is_odd_frame: Check if this frame is odd                 */
-/*                                                                   */
-/*      Input: base is a pointer to the frame scheduler              */
-/*                                                                   */
-/*    Returns: TRUE if odd, FALSE if even                            */
-/*...................................................................*/
-static int periodic_is_odd_frame(FrameScheduler *base)
-{
-  FrameSchedulerPeriodic *scheduler = (FrameSchedulerPeriodic *) base;
-  assert (scheduler != 0);
-
-  return scheduler->nextFrame & 1 ? TRUE : FALSE;
-}
-
-/*...................................................................*/
 /* Global Functions                                                  */
 /*...................................................................*/
-
-/*...................................................................*/
-/* FrameSchedulerPeriodicInit: Initialize scheduler for periodic     */
-/*                                                                   */
-/*      Input: scheduler is a pointer to the frame scheduler         */
-/*...................................................................*/
-void FrameSchedulerPeriodicInit(FrameSchedulerPeriodic *scheduler)
-{
-  assert (scheduler != 0);
-
-  FrameScheduler *base = (FrameScheduler *) scheduler;
-
-  base->frameSchedulerRelease = periodic_release;
-  base->startSplit = periodic_start_split;
-  base->completeSplit = periodic_complete_split;
-  base->transactionComplete = periodic_transaction_complete;
-  base->waitForFrame = periodic_wait_for_frame;
-  base->isOddFrame = periodic_is_odd_frame;
-
-  scheduler->state = StateUnknown;
-  scheduler->nextFrame = FRAME_PERIODIC_MAX;
-}
 
 /*...................................................................*/
 /* FrameSchedulerNonPeriodicInit: Initialize scheduler non-periodic  */
@@ -574,7 +398,6 @@ void TransferStageDataAttach(TransferStageData *transfer, u32 channel,
   transfer->speed = ((Device *)transfer->device)->speed;
   transfer->maxPacketSize =
                        ((Endpoint *)transfer->endpoint)->maxPacketSize;
-
   transfer->splitTransaction =
                      (((Device *)transfer->device)->hubAddress != 0) &&
                      (transfer->speed != SpeedHigh);
@@ -640,14 +463,6 @@ void TransferStageDataAttach(TransferStageData *transfer, u32 channel,
 
   if (transfer->splitTransaction)
   {
-    if (TransferStageDataIsPeriodic (transfer))
-    {
-      transfer->frameScheduler =
-                  (FrameScheduler *)&transfer->FrameScheduler.periodic;
-      FrameSchedulerPeriodicInit(
-                   (FrameSchedulerPeriodic *)transfer->frameScheduler);
-    }
-    else
     {
       transfer->frameScheduler =
                (FrameScheduler *)&transfer->FrameScheduler.nonperiodic;
@@ -656,19 +471,6 @@ void TransferStageDataAttach(TransferStageData *transfer, u32 channel,
     }
 
     assert (transfer->frameScheduler != 0);
-  }
-  else
-  {
-    if (((Device *)transfer->device)->hubAddress == 0
-        && transfer->speed != SpeedHigh)
-    {
-      transfer->frameScheduler =
-                   (FrameScheduler *)&transfer->FrameScheduler.nosplit;
-      FrameSchedulerNoSplitInit(
-                     (FrameSchedulerNoSplit *)transfer->frameScheduler,
-                     TransferStageDataIsPeriodic(transfer));
-      assert(transfer->frameScheduler != 0);
-    }
   }
 }
 
@@ -750,23 +552,6 @@ void TransferStageDataTransactionComplete(TransferStageData *transfer,
 }
 
 /*...................................................................*/
-/* TransferStageDataIsPeriodic: Check if transfer stage is periodic  */
-/*                                                                   */
-/*      Input: transfer is a pointer to the transfer stage data      */
-/*                                                                   */
-/*    Returns: TRUE if periodic, FALSE otherwise                     */
-/*...................................................................*/
-int TransferStageDataIsPeriodic(TransferStageData *transfer)
-{
-  assert (transfer != 0);
-  assert (transfer->endpoint != 0);
-  EndpointType type = ((Endpoint *)transfer->endpoint)->type;
-
-  return ((type == EndpointTypeInterrupt) ||
-          (type == EndpointTypeIsochronous));
-}
-
-/*...................................................................*/
 /* TransferStageDataGetDeviceAddress: Get transfer device address    */
 /*                                                                   */
 /*      Input: transfer is a pointer to the transfer stage data      */
@@ -814,9 +599,9 @@ u8 TransferStageDataGetPID(TransferStageData *transfer)
   assert (transfer != 0);
   assert (transfer->endpoint != 0);
 
-  u8 pid = 0;
+  u8 pid = EndpointGetNextPID(transfer->endpoint, transfer->statusStage);
 
-  switch (EndpointGetNextPID(transfer->endpoint, transfer->statusStage))
+  switch (pid)
   {
   case PIDSetup:
     pid = HC_T_SIZ_PID_SETUP;
@@ -832,6 +617,8 @@ u8 TransferStageDataGetPID(TransferStageData *transfer)
 
   default:
     assert (0);
+    printf("PIDsetup %d unknown\n", pid);
+    pid = 0;
     break;
   }
 
@@ -850,8 +637,8 @@ u32 TransferStageDataGetStatusMask(TransferStageData *transfer)
   u32 mask = HC_INT_XFER_COMP | HC_INT_CH_HLTD | HC_INT_ERROR_MASK;
   assert (transfer != 0);
 
-  if (transfer->splitTransaction ||
-      TransferStageDataIsPeriodic(transfer))
+  if (transfer->splitTransaction /*||
+      TransferStageDataIsPeriodic(transfer)*/)
     mask |= HC_INT_ACK | HC_INT_NAK | HC_INT_NYET;
 
   return  mask;

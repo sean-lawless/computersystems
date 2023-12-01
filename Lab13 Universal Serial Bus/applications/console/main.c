@@ -40,7 +40,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <usb/request.h>
 #include <usb/device.h>
 
 /*...................................................................*/

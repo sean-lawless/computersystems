@@ -44,7 +44,6 @@
 #include <game_grid.h>
 #endif
 #if ENABLE_USB
-//#include <usb/request.h>
 #include <usb/device.h>
 #endif
 
@@ -208,7 +207,6 @@ static int run(const char *command)
   if (UsbUp)
   {
     HostDisable();
-//    RequestInit();
     DeviceInit();
     UsbUp = FALSE;
   }
@@ -245,7 +243,6 @@ static int quit(const char *command)
   if (UsbUp)
   {
     HostDisable();
-//    RequestInit();
     DeviceInit();
     UsbUp = FALSE;
   }
