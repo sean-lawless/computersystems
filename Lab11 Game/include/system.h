@@ -228,7 +228,6 @@ u64 TimerNow(void);
 void SystemShell(void);
 int ShellPoll(void *data);
 int LedPoll(void *data);
-int TimerPoll(void *data);
 
 /*
  * Screen interface

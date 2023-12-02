@@ -71,7 +71,6 @@ void BoardInit(void)
 
   // initialize the LED state
   bzero(&LedState, sizeof(struct led_state));
-  LedTime = 0;
 
   /* Enable LED. 3 bits per GPIO so 10 GPIOs per select register. */
 #if RPI == 4
@@ -307,12 +306,10 @@ void BoardInit(void)
   ShellInit();
 #endif
 
-#if ENABLE_OS
   /* Initialize LED task blinker. */
   LedTime = MICROS_PER_SECOND;
   LedState.expire = TimerRegister(LedTime);
   LedState.state = 0;
-#endif
 }
 
 /*...................................................................*/
@@ -438,10 +435,10 @@ u64 TimerRemaining(struct timer *tw)
   return tw->expire - now;
 }
 
-/*.....................................................................*/
-/*   TimerNow: Return the current time in clock ticks                  */
-/*                                                                     */
-/*.....................................................................*/
+/*...................................................................*/
+/*   TimerNow: Return the current time in clock ticks                */
+/*                                                                   */
+/*...................................................................*/
 u64 TimerNow(void)
 {
   u64 now;

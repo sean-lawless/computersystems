@@ -322,9 +322,11 @@ int ShellPoll(void *data)
 /*...................................................................*/
 void SystemShell(void)
 {
-  /* Loop to poll the shell, accepting commands and executing them. */
+  /* Loop to poll led and shell, executing commands.*/
   for (; ShellPoll(&Uart0State) != TASK_FINISHED;)
-    ;
+  {
+    LedPoll(&LedState);
+  }
 }
 
 #endif /* ENABLE_SHELL */

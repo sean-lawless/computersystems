@@ -400,7 +400,6 @@ int ShellPoll(void *data)
 {
   static u64 command_time;
   struct shell_state *state = data;
-  struct shell_state *std;
 
   /* Check if command is currently executing. */
   if (state->cmd)
@@ -431,10 +430,14 @@ int ShellPoll(void *data)
 
     /* Calculate clock delta and return command result. */
     command_time = TimerNow() - command_time;
-    std = StdioState;
+#if ENABLE_OS
+    struct shell_state *std = StdioState;
     StdioState = state;
     putu32(command_time);
     StdioState = std;
+#else
+    putu32(command_time);
+#endif
 
     /* Restore led timer. */
     LedTime = LedTime * 8;
@@ -533,9 +536,12 @@ int ShellPoll(void *data)
 /*...................................................................*/
 void SystemShell(void)
 {
-  /* Loop to poll the shell, accepting commands and executing them. */
+  /* Loop to poll shell, executing commands, with timer/led.*/
   for (; ShellPoll(&Uart0State) != TASK_FINISHED;)
-    ;
+  {
+    TimerPoll(&TimerStart);
+    LedPoll(&LedState);
+  }
 }
 
 #endif /* ENABLE_SHELL */

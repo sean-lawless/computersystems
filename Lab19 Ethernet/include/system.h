@@ -295,12 +295,6 @@ u32 CharacterHeight();
 u32 CharacterWidth();
 
 /*
- * Malloc Interface
-*/
-void MallocInit(uintptr_t base, u32 size);
-u32 MallocRemaining(void);
-
-/*
  * Operating System interface
 */
 void OsInit(void);

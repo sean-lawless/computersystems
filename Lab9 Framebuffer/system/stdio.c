@@ -40,6 +40,8 @@
 
 #if ENABLE_OS
 struct shell_state *StdioState;
+#else
+#include <board.h>
 #endif
 
 /*...................................................................*/
@@ -150,7 +152,6 @@ int puts(const char *string)
 /*      Inputs: byte - the byte to transmit (Tx) to UART             */
 /*                                                                   */
 /*     Returns: the value of the byte that was transmitted           */
-/*                                                                   */
 /*...................................................................*/
 u8 putbyte(u8 byte)
 {

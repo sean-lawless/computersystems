@@ -71,7 +71,6 @@ void BoardInit(void)
 
   // initialize the LED state
   bzero(&LedState, sizeof(struct led_state));
-  LedTime = 0;
 
   /* Enable LED. 3 bits per GPIO so 10 GPIOs per select register. */
 #if RPI == 4
@@ -307,12 +306,10 @@ void BoardInit(void)
   ShellInit();
 #endif
 
-#if ENABLE_OS
   /* Initialize LED task blinker. */
   LedTime = MICROS_PER_SECOND;
   LedState.expire = TimerRegister(LedTime);
   LedState.state = 0;
-#endif
 }
 
 /*...................................................................*/
@@ -572,7 +569,7 @@ void SystemReboot(void)
 /*             blue - the 8 bit blue component of the color          */
 /*             alpha - the 8 bit intensity of the color              */
 /*                                                                   */
-/*    Returns: Zero (0) or current time if unexpired                 */
+/*    Returns: 32 bit ARGB color for RPI                             */
 /*...................................................................*/
 u32 Color32(u8 red, u8 green, u8 blue, u8 alpha)
 {

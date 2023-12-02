@@ -295,12 +295,6 @@ u32 CharacterHeight();
 u32 CharacterWidth();
 
 /*
- * Malloc Interface
-*/
-void MallocInit(uintptr_t base, u32 size);
-u32 MallocRemaining(void);
-
-/*
  * Operating System interface
 */
 void OsInit(void);
@@ -333,13 +327,6 @@ int HostSetEndpointConfiguration(void *device, void *endpoint,
       u8 configurationValue, void (complete)(void *urb, void *param,
       void *context), void *param);
 int HostGetPortSpeed(void);
-
-/*
- * Ethernet interface
-*/
-const u8 *LanGetMAC(void);
-int LanDeviceSendFrame(const void *buffer, u32 length);
-int LanReceiveAsync(void);
 
 /*
  * Double linked list inline functions

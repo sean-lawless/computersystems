@@ -40,6 +40,8 @@
 
 #if ENABLE_OS
 struct shell_state *StdioState;
+#else
+#include <board.h>
 #endif
 
 /*...................................................................*/

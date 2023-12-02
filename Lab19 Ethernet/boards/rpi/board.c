@@ -73,7 +73,6 @@ void BoardInit(void)
 
   // initialize the LED state
   bzero(&LedState, sizeof(struct led_state));
-  LedTime = 0;
 
   /* Enable LED. 3 bits per GPIO so 10 GPIOs per select register. */
 #if RPI == 4
@@ -301,16 +300,18 @@ void BoardInit(void)
 #endif
 #endif /* ENABLE_UART1 */
 
+#if ENABLE_XMODEM
+  XmodemInit();
+#endif
+
 #if ENABLE_SHELL
   ShellInit();
 #endif
 
-#if ENABLE_OS
   /* Initialize LED task blinker. */
   LedTime = MICROS_PER_SECOND;
   LedState.expire = TimerRegister(LedTime);
   LedState.state = 0;
-#endif
 }
 
 /*...................................................................*/
