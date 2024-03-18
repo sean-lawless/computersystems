@@ -119,7 +119,7 @@ i8 MountedPartition = 0;
 i8 PartitionToMount = -1;
 struct partition partitions[4];
 
-void read_sector_callback(u8 *buffer, int buffLen)
+void read_sector_callback(u8 *buffer, int buffLen, void *unused)
 {
   int i;
 
@@ -222,12 +222,20 @@ int MountFilesystem(char *command)
     else
       PartitionToMount = 0;
 
+    // Create the polling task and initialize the FAT file system
+#if ENABLE_OS
+    TaskNew(MAX_TASKS - 4, FatPoll, NULL);
+#endif
+    FatInit();
+
+/*
     // Seek to first block, the MBR
     MassStorageSeek(0);
 
     // Read the Master Boot Record (MBR)
-    if (MassStorageRead(ReadSector, 512, read_sector_callback) <= 0)
+    if (MassStorageRead(ReadSector, 512, read_sector_callback, NULL) <= 0)
       puts("MassStorageRead failed");
+*/
   }
   else
     puts("USB not initialized");
@@ -257,7 +265,7 @@ int ReadFilesystem(const char *command)
     }
 
     // Read the sector
-    if (MassStorageRead(ReadSector, 512, read_sector_callback) <= 0)
+    if (MassStorageRead(ReadSector, 512, read_sector_callback, NULL) <= 0)
       puts("MassStorageRead failed");
   }
   else

@@ -68,6 +68,9 @@ APP     = ../../boards/rpi/app.o \
           ../../boards/peripherals/ethernet/lan78xx.o \
           ../../boards/peripherals/uart/16550.o \
           ../../boards/peripherals/uart/16C650.o \
+          ../../fat/asyncfatfs.o \
+          ../../fat/fat_standard.o \
+          ../../fat/sdcard.o \
           ../../system/character.o \
           ../../system/console.o \
           ../../system/os.o \

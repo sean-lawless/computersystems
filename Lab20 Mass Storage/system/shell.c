@@ -554,6 +554,9 @@ void SystemShell(void)
   {
     TimerPoll(&TimerStart);
     LedPoll(&LedState);
+#if ENABLE_FAT
+    FatPoll(NULL);
+#endif
   }
 }
 

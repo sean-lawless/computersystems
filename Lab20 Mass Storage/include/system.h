@@ -102,6 +102,7 @@
 /*
  * Integer types
 */
+typedef enum {false, true} bool;
 typedef unsigned char      u8;
 typedef unsigned short     u16;
 typedef unsigned int       u32;
@@ -345,11 +346,19 @@ int LanReceiveAsync(void);
 u32 MassStorageBlockSize();
 u32 MassStorageBlockCapacity();
 int MassStorageRead(void *buffer, u32 count,
-                    void (callback)(u8 *buffer, int buffLen));
+                    void (callback)(u8 *buffer, int buffLen,
+                                    void *callback_payload),
+                    void *callback_payload);
 int MassStorageWrite(const void *buffer, u32 count,
-                     void (callback)(u8 *buffer, int buffLen));
+                     void (callback)(u8 *buffer, int buffLen,
+                                     void *callback_payload),
+                     void *callback_payload);
 u64 MassStorageSeek(u64 offset);
 u64 MassStorageOffset();
+
+/* FAT interface */
+void FatInit();
+int FatPoll(void *unused);
 
 /*
  * Double linked list inline functions

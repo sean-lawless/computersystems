@@ -68,6 +68,7 @@
 #define ENABLE_USB_ETHER   (TRUE && ENABLE_USB)  /* enable Ethernet */
 #define ENABLE_USB_STORAGE (TRUE && ENABLE_USB)  /*enable Mass Storage*/
 #define ENABLE_USB_TASK    (FALSE && ENABLE_USB) /* USB intr task */
+#define ENABLE_FAT         (TRUE && ENABLE_USB_STORAGE) /* file system*/
 
 /* DO NOT EDIT BELOW : Derived configurations */
 #define ENABLE_ETHER       ENABLE_USB_ETHER  /* enable Ethernet */

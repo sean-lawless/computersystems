@@ -110,7 +110,8 @@ typedef struct MassStorageDevice
   int commandBufferLen;
   void (*commandComplete)
        (void *urb, void *param, void *context);
-  void (*operationCallback)(u8 *buffer, int buffLen);
+  void (*operationCallback)(u8 *buffer, int buffLen, void *opPayload);
+  void *operationPayload;
 
   // Device variables
   u32 tag;
@@ -333,13 +334,15 @@ csw:
       return;
     }
 
+    // Ignore CSW data residue for now, pass to command complete
+/*
     if (CSW.dataResidue != 0)
     {
       puts("Data residue > 0");
       massStorage->commandState = 0;
       return;
     }
-
+*/
     // Ignore CSW status, but pass resulting CSW to command complete
 
     // Reset the command state and invoke the command complete callback
@@ -718,13 +721,13 @@ static int reset(MassStorageDevice *massStorage)
 }
 
 /*...................................................................*/
-/* read_complete: State machine to read from bulk-only mass storage  */
+/* op_complete: User level operation callback for mass storage       */
 /*                                                                   */
 /*      Inputs: urb is USB Request Buffer (URB)                      */
 /*              param is the keyboard device                         */
 /*              context is resulting Command Status Wrapper (CSW)    */
 /*...................................................................*/
-static void read_complete(void *urb, void *param, void *context)
+static void op_complete(void *urb, void *param, void *context)
 {
   MassStorageDevice *massStorage = (MassStorageDevice *)param;
   CommandStatusWrapper *csw = context;
@@ -741,10 +744,16 @@ static void read_complete(void *urb, void *param, void *context)
     massStorage->commandBufferLen = -csw->status; // return failure
   }
 
+  // If there is data left over, reduce the amount
+  if ((csw->dataResidue > 0) &&
+      (massStorage->commandBufferLen >= csw->dataResidue))
+    massStorage->commandBufferLen -= csw->dataResidue;
+
   // Invoke the user callback if configured
   if (massStorage->operationCallback)
     massStorage->operationCallback(massStorage->commandBuffer,
-                                   massStorage->commandBufferLen);
+                                   massStorage->commandBufferLen,
+                                   massStorage->operationPayload);
 
   // Clear the buffer for next user command
   massStorage->commandBuffer = NULL;
@@ -787,7 +796,7 @@ static int read(MassStorageDevice *device, void *buffer, unsigned count)
   SCSIRead.Control = SCSI_CONTROL;
 
   if (command(device, &SCSIRead, sizeof SCSIRead, buffer, count, TRUE,
-              read_complete) < 0)
+              op_complete) < 0)
   {
     puts("MS read failed");
     return -1;
@@ -803,7 +812,7 @@ static int read(MassStorageDevice *device, void *buffer, unsigned count)
 /*              param is the keyboard device                         */
 /*              context is unused                                    */
 /*...................................................................*/
-static void write_complete(void *urb, void *param, void *context)
+/*static void write_complete(void *urb, void *param, void *context)
 {
   MassStorageDevice *massStorage = (MassStorageDevice *)param;
   CommandStatusWrapper *csw = context;
@@ -820,6 +829,11 @@ static void write_complete(void *urb, void *param, void *context)
     massStorage->commandBufferLen = -csw->status; // return failure
   }
 
+  // If there is data left over, reduce the amount written
+  if ((csw->dataResidue > 0) &&
+      (massStorage->commandBufferLen >= csw->dataResidue))
+    massStorage->commandBufferLen -= csw->dataResidue;
+
   // Invoke the user callback if configured
   if (massStorage->operationCallback)
     massStorage->operationCallback(massStorage->commandBuffer,
@@ -832,6 +846,7 @@ static void write_complete(void *urb, void *param, void *context)
   // Increment the offset to the next block for the next read
   massStorage->offset += BLOCK_SIZE;
 }
+*/
 
 static int write(MassStorageDevice *device, const void *buffer,
                  u32 count)
@@ -867,7 +882,7 @@ static int write(MassStorageDevice *device, const void *buffer,
   SCSIWrite.Control = SCSI_CONTROL;
 
   if (command(device, &SCSIWrite, sizeof SCSIWrite, (void *)buffer,
-              count, FALSE, write_complete) < 0)
+              count, FALSE, op_complete) < 0)
   {
     puts("Write command failed to initiate");
     return -1;
@@ -920,22 +935,28 @@ void MassStorageRelease(MassStorageDevice *device)
 }
 
 int MassStorageRead(void *buffer, u32 count,
-                          void (callback)(u8 *buffer, int buffLen))
+                    void (callback)(u8 *buffer, int buffLen,
+                                    void *payload),
+                    void *payload)
 {
   MassStorageDevice *device = MS1;
   assert(device != 0);
 
   device->operationCallback = callback;
+  device->operationPayload = payload;
   return read(device, buffer, count);
 }
 
 int MassStorageWrite(const void *buffer, u32 count,
-                           void (callback)(u8 *buffer, int buffLen))
+                           void (callback)(u8 *buffer, int buffLen,
+                                           void *payload),
+                           void *payload)
 {
   MassStorageDevice *device = MS1;
   assert(device != 0);
 
   device->operationCallback = callback;
+  device->operationPayload = payload;
   return write(device, buffer, count);
 }
 
