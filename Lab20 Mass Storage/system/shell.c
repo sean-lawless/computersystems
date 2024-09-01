@@ -64,7 +64,14 @@ extern int MouseUp(const char *command);
 #endif
 #if ENABLE_USB_STORAGE
 extern int MountFilesystem(const char *command);
-extern int ReadFilesystem(const char *command);
+extern int ReadBlock(const char *command);
+extern int ReadDirectory(const char *command);
+extern int ChangeDirectory(const char *command);
+extern int PrintWorkingDirectory(const char *command);
+extern int ReadFile(const char *command);
+#endif
+#if ENABLE_FAT
+extern int MountFAT(const char *command);
 #endif
 #endif /* ENABLE_USB */
 
@@ -352,7 +359,19 @@ int ShellInit(void)
   ShellCommands[++i].command = "Mount";
   ShellCommands[i].function = MountFilesystem;
   ShellCommands[++i].command = "read";
-  ShellCommands[i].function = ReadFilesystem;
+  ShellCommands[i].function = ReadBlock;
+  ShellCommands[++i].command = "dir";
+  ShellCommands[i].function = ReadDirectory;
+  ShellCommands[++i].command = "pwd";
+  ShellCommands[i].function = PrintWorkingDirectory;
+  ShellCommands[++i].command = "cd";
+  ShellCommands[i].function = ChangeDirectory;
+  ShellCommands[++i].command = "cat";
+  ShellCommands[i].function = ReadFile;
+#endif
+#if ENABLE_FAT
+  ShellCommands[++i].command = "fat";
+  ShellCommands[i].function = MountFAT;
 #endif
 #if ENABLE_USB_HID
   ShellCommands[++i].command = "Keyboard";

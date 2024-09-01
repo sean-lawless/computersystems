@@ -639,7 +639,7 @@ void TransferStageDataAttach(TransferStageData *transfer, u32 channel,
     assert (transfer->bufferPointer != 0);
   else
     transfer->bufferPointer = &transfer->TempBuffer;
-  assert (((u32) transfer->bufferPointer & 3) == 0);
+  assert (((uintptr_t)transfer->bufferPointer & 3) == 0);
 
   if (transfer->splitTransaction)
   {

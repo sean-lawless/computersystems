@@ -1,0 +1,34 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../boards"
+		},
+		{
+			"path": "../../fat"
+		},
+		{
+			"path": "../../include"
+		},
+		{
+			"path": "../../system"
+		},
+		{
+			"path": "../../usb"
+		}
+	],
+	"settings": {
+		"makefile.launchConfigurations": [
+			{
+				"cwd": "e:\\Source\\computersystems\\Lab20 Mass Storage\\applications\\console",
+				"binaryPath": "e:\\Source\\computersystems\\Lab20 Mass Storage\\applications\\console\\console.elf",
+				"binaryArgs": []
+			}
+		],
+		"files.associations": {
+			"system.h": "c"
+		}
+	}
+}

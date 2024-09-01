@@ -48,7 +48,7 @@ int MassStorageRead(void *buffer, u32 count,
                     void (callback)(u8 *buffer, int buffLen),
                     void *callback_payload);
 */
-#define MAX_OPERATIONS 1
+#define MAX_OPERATIONS 8
 
 typedef struct OpCallback
 {
@@ -205,21 +205,5 @@ bool sdcard_poll()
  * Only required to be provided when using AFATFS_USE_INTROSPECTIVE_LOGGING.
  */
 //void sdcard_setProfilerCallback(sdcard_profilerCallback_c callback);
-
-/*..................................................................*/
-/* FatPoll: poll the FAT file system                                */
-/*                                                                  */
-/* returns: exit error                                              */
-/*..................................................................*/
-int FatPoll(void *unused)
-{
-  afatfs_poll();
-  return TASK_FINISHED;
-}
-
-void FatInit()
-{
-  afatfs_init();
-}
 
 #endif /* ENABLE_FAT */

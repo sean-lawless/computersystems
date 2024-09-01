@@ -620,3 +620,31 @@ u32 __aeabi_uidiv(u32 value, u32 divisor)
   // Use the division modulus, ignoring/truncating the remainder
   return __aeabi_uidivmod(value, divisor);
 };
+
+// ARM EABI signed integer division support for GCC
+i32 __aeabi_idiv(i32 value, i32 divisor)
+{
+  u32 v, div;
+  int result;
+
+  // Remove the negative attributes and convert to u32
+  if (divisor < 0)
+    div = (u32)-divisor;
+  else
+    div = (u32)divisor;
+  if (value < 0)
+    v = (u32)-value;
+  else
+    v = (u32)value;
+
+  // Use the division modulus, ignoring/truncating the remainder
+  result = (i32)__aeabi_uidivmod(v, div);
+
+  // Add back the negative attribute
+  if (divisor < 0)
+    result = -result;
+  if (value < 0)
+    result = -result;
+
+  return result;
+};

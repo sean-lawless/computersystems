@@ -55,6 +55,7 @@ uint32_t afatfs_fwrite(afatfsFilePtr_t file, const uint8_t *buffer, uint32_t len
 uint32_t afatfs_fread(afatfsFilePtr_t file, uint8_t *buffer, uint32_t len);
 afatfsOperationStatus_e afatfs_fseek(afatfsFilePtr_t file, int32_t offset, afatfsSeek_e whence);
 bool afatfs_ftell(afatfsFilePtr_t file, uint32_t *position);
+bool afatfs_feof(afatfsFilePtr_t file);
 
 bool afatfs_mkdir(const char *filename, afatfsFileCallback_t complete);
 bool afatfs_chdir(afatfsFilePtr_t dirHandle);

@@ -104,14 +104,14 @@ size_t strlen(const char *string)
 /*      Inputs: dst - the existing string appended to                */
 /*              add - the new string to be appended to existing      */
 /*                                                                   */
-/*     Returns: Success (0)                                          */
+/*     Returns: The destination pointer (dst) on success             */
 /*...................................................................*/
-size_t strcat(char *dst, const char *add)
+char *strcat(char *dst, const char *add)
 {
   int length = strlen(dst); /*safer : strnlen(dst, 1024);? */
 
-  memcpy(&dst[length], add, strlen(add));
-  return length;
+  memcpy(&dst[length], add, strlen(add) + 1);
+  return dst;
 }
 
 /*...................................................................*/

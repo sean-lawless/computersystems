@@ -122,3 +122,4 @@ bool fat_isDirectoryEntryTerminator(fatDirectoryEntry_t *entry);
 bool fat_isDirectoryEntryEmpty(fatDirectoryEntry_t *entry);
 
 void fat_convertFilenameToFATStyle(const char *filename, uint8_t *fatFilename);
+void fat_convertFATStyleToFilename(const char *fatFilename, char *filename);

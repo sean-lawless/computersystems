@@ -133,10 +133,10 @@ typedef unsigned char      uint8_t;
 typedef unsigned short     uint16_t;
 typedef unsigned int       uint32_t;
 typedef unsigned long long uint64_t;
-typedef char               int8_t;
-typedef short              int16_t;
-typedef int                int32_t;
-typedef long long          int64_t;
+typedef signed char        int8_t;
+typedef signed short       int16_t;
+typedef signed int         int32_t;
+typedef signed long long   int64_t;
 
 #if COLOR_DEPTH_BITS == 16
   #define COLOR16(red, green, blue)   (((((u16)red) & 0x1F) << 11) | \

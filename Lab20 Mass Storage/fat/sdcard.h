@@ -4,6 +4,8 @@
 //#include <stdint.h>
 //#include <stdbool.h>
 
+#define SECTOR_SIZE 512
+
 typedef struct sdcard_metadata_t {
     uint8_t manufacturerID;
     uint16_t oemID;

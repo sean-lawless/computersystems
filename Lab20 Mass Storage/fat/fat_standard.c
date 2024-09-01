@@ -75,4 +75,39 @@ void fat_convertFilenameToFATStyle(const char *filename, uint8_t *fatFilename)
      }
 }
 
+/**
+ * Convert the FAT format stored on disk to the style filename given as "prefix.ext".
+ *
+ * filename must point to a buffer which is FAT_FILENAME_LENGTH + 1 bytes long. The buffer IS null-terminated.
+ */
+void fat_convertFATStyleToFilename(const char *fatFilename, char *filename)
+{
+    for (int i = 0; i < 8; i++) {
+        if (*fatFilename == ' ') { //*filename == '\0' || *filename == '.') {
+            *filename = '\0';
+        } else {
+            *filename = *fatFilename;
+            filename++;
+        }
+        fatFilename++;
+    }
+
+    if (*fatFilename != ' ')
+    {
+      *filename = '.';
+      ++filename;
+    }
+
+    for (int i = 0; i < 3; i++) {
+         if (*fatFilename == ' ') {
+             *filename = '\0';
+         } else {
+             *filename = *fatFilename;
+             fatFilename++;
+         }
+         filename++;
+     }
+     *filename = '\0';
+}
+
 #endif /* ENABLE_FAT */

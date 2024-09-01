@@ -427,6 +427,8 @@ typedef enum {
 } afatfsInitializationPhase_e;
 
 typedef struct afatfs_t {
+    uint8_t cache[AFATFS_SECTOR_SIZE * AFATFS_NUM_CACHE_SECTORS];
+    afatfsCacheBlockDescriptor_t cacheDescriptor[AFATFS_NUM_CACHE_SECTORS];
     fatFilesystemType_e filesystemType;
 
     afatfsFilesystemState_e filesystemState;
@@ -440,8 +442,6 @@ typedef struct afatfs_t {
     } initState;
 #endif
 
-    uint8_t cache[AFATFS_SECTOR_SIZE * AFATFS_NUM_CACHE_SECTORS];
-    afatfsCacheBlockDescriptor_t cacheDescriptor[AFATFS_NUM_CACHE_SECTORS];
     uint32_t cacheTimer;
 
     int cacheDirtyEntries; // The number of cache entries in the AFATFS_CACHE_STATE_DIRTY state
@@ -1617,8 +1617,6 @@ static afatfsOperationStatus_e afatfs_appendRegularFreeCluster(afatfsFilePtr_t f
     return afatfs_appendRegularFreeClusterContinue(file);
 }
 
-#ifdef AFATFS_USE_FREEFILE
-
 /**
  * Size of a AFATFS supercluster in bytes
  */
@@ -1628,6 +1626,7 @@ uint32_t afatfs_superClusterSize()
     return afatfs_fatEntriesPerSector() * afatfs_clusterSize();
 }
 
+#ifdef AFATFS_USE_FREEFILE
 /**
  * Continue to attempt to add a supercluster to the end of the given file.
  *

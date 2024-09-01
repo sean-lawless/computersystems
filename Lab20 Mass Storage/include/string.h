@@ -53,8 +53,10 @@ extern const char *strchr(const char *string, char find);
 extern int strcmp(const char *string1, const char *string2);
 extern size_t strlen(const char *string);
 extern int strnlen(const char *string, int length);
-extern size_t strcat(char *dst, const char *add);
-#define toupper(c) (c >= 'a') || (c <= 'z') ? c - 32 : c
+extern char *strcat(char *dst, const char *add);
+#define toupper(c) (c >= 'a') && (c <= 'z') ? c - 32 : c
+#define tolower(c) (c >= 'A') && (c <= 'Z') ? c + 32 : c
+#define ischar(c) (c >= 'A') && (c <= 'z') ? TRUE : FALSE
 //extern char toupper(char character);
 #define strcpy(dst, src) memcpy(dst, src, strlen(src) + 1)
 #define strncpy(dst, src, len) memcpy(dst, src, min(strlen(src)+1, len))
