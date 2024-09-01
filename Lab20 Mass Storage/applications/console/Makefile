@@ -70,6 +70,7 @@ APP     = ../../boards/rpi/app.o \
           ../../boards/peripherals/uart/16C650.o \
           ../../fat/asyncfatfs.o \
           ../../fat/fat_standard.o \
+          ../../fat/fat.o \
           ../../fat/sdcard.o \
           ../../system/character.o \
           ../../system/console.o \
