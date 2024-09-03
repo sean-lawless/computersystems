@@ -1,3 +1,4 @@
 {
-  "makefile.makefilePath": "."
+  "makefile.makefilePath": ".",
+  "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
 }
