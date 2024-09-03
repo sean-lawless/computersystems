@@ -92,7 +92,7 @@ The expected final step is to install the serial terminal by awsxxf Extension an
 
 The final step to debugger support is to configure the Run and Debug pane on the left side of Visual Studio Code. Select this pane and press the configuration wheel in the top left to open the launch.json file to configure your debugger settings. Select the Add Configuration button at the bottom of the page and select ‘{} C/C++: (gdb) launch’. This will create a boiler plate configuration that we have to change to our cross compiler and debugger. Edit the launch.json file to look like that below, with the paths changed to match your application if different.
 
-```json
+```js
 {
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
