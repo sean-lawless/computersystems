@@ -20,7 +20,7 @@ c:/Source/computersystems/Lab20 Mass Storage/**
 
 Be sure to modify them for your code installation directory. The resulting c_cpp_properties.json configuration will look something like this.
 
-```
+```json
 {
     "configurations": [
         {
@@ -63,7 +63,7 @@ Once the Makefile Tools extension is installed, move the new extension to the ri
 
 With the code editor and build process now integrated, only the debugging flow still requires command line initiation in a terminal window. The next step is to run OpenOCD in a new Terminal window attached to Visual Studio Code. In the bottom middle pane select TERMINAL and press the plus icon for New Terminal and select the console directory to start in. Now, in this terminal run the OpenOCD command for your connection and hardware configuration. Here is an example for Windows development PC using the SiPeed USB to JTAG/UART adapter communicating with a Raspberry Pi version 1. See Appendix A and the Computer Systems book for more information.
 
-```
+```bash
 console> openocd -f ../../boards/rpi/openocd_sipeed_jtag.cfg -f ../../boards/rpi/rpi1_jtag.cfg
 Open On-Chip Debugger 0.12.0
 Licensed under GNU GPL v2
@@ -92,7 +92,7 @@ The expected final step is to install the serial terminal by awsxxf Extension an
 
 The final step to debugger support is to configure the Run and Debug pane on the left side of Visual Studio Code. Select this pane and press the configuration wheel in the top left to open the launch.json file to configure your debugger settings. Select the Add Configuration button at the bottom of the page and select ‘{} C/C++: (gdb) launch’. This will create a boiler plate configuration that we have to change to our cross compiler and debugger. Edit the launch.json file to look like that below, with the paths changed to match your application if different.
 
-```
+```json
 {
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
@@ -129,7 +129,7 @@ Note that the miDebuggeerPath and ServerAddress are set to use the ARM debugger 
 
 With no serial terminal extension available that supports Xmodem, to upload the new executable requires we pivot to leverage the JTAG interface to load a newly compiled application. Fortunately, GDB supports the ‘load’ command so within the opened the DEBUG CONSOLE, ensure the debugger is paused (pause button) and issue the command -exec load console.elf.
 
-```
+```bash
 -exec load console.elf
 Loading section .text, size 0x190fc lma 0x8000
 1063+download,{section=".text",section-size="102652",total-size="305084"}
@@ -139,7 +139,7 @@ Load failed
 
 Unfortunately, there are some issues with the JTAG and RPi boards, so this load fails for the new executable file (.elf). To work around the issue, we go back to the TERMINAL and open a new one in the console application directory (or any for that matter) and connect to OpenOCD directly with telnet. Once connect to OpenOCD with telnet we can issue the fast_load_image console.elf and fast_load commands to copy the executable image to the RPi’s memory for debugging. Substitute your application file instead of console.elf if different.
 
-```
+```bash
 console> telnet 127.0.0.1 4444
 Trying 127.0.0.1...
 Connected to 127.0.0.1.
@@ -160,7 +160,7 @@ Write to 0x00008000, length 0x00022f51
 
 Fortunately these commands ignore the transfer warnings and write the binary image to the memory (at address 0x8000 as specified in the .elf file and our Makefile). Now we press the Continue button in the debugger pane but again nothing happens. Why? Because we are still executing the bootloader application. Open the serial console (PORT: COM? window in bottom TERMINAL pane) and the shell should be responsive. If not, be sure the debugger is not paused. Enter the run command in the serial terminal to begin execution of the application at address 0x8000.
 
-```
+```bash
 boot> run
 
 Computer Systems
