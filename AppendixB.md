@@ -12,9 +12,10 @@ So, let’s get started. After installing Visual Studio Code, we open it and cre
 With all the code now in the workspace we also need to help set up the C/C++ Configuration to support our tool chain and directory structure. Press Ctrl-Shift-P and select C/C++: Edit Configurations (UI) then select the console folder. The IntelliSense Configurations screen will appear. Select Add Configuration, name it something like Arm-RPi and set the Compiler path to your cross compiler, such as C:\msys64\mingw64\bin\arm-none-eabi-gcc.exe and for Compiler arguments add -freestanding and set IntelliSense mode to gcc-arm (legacy) and, most importantly add these two lines to the Include path.
 
 ```
-c:/Source/computersystems/Lab20 Mass Storage/applications/console/*,
+c:/Source/computersystems/Lab20 Mass Storage/applications/console/*
 c:/Source/computersystems/Lab20 Mass Storage/**
 ```
+
 ![image intellisense](./images/VisualStudioCode_IntelliSense-Configuration.png)
 
 Be sure to modify them for your code installation directory. The resulting c_cpp_properties.json configuration will look something like this.
