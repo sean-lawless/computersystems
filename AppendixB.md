@@ -1,6 +1,8 @@
 
 # Visual Studio Code IDE for bare metal Raspberry Pi
 
+![image cover](./images/VisualStudioCode.png)
+
 Long a favorite for web developers, Microsoft Visual Studio Code now has extensions and features to robustly support embedded software development. This article describes how to set up a workspace for rapid development of a bare metal embedded device utilizing JTAG and UART connections between the cross-compiling development PC and a bare metal ARM embedded device, in this example, a Raspberry Pi.
 
 This article assumes that a cross-compiler and Makefile tools are already installed on the development PC (see Appendix A | computersystems (sean-lawless.github.io). It is also assumed that the latest OpenOCD is installed on the PC and a UART/JTAG adapter is connected correctly between the PC and embedded device (Raspberry Pi, ie. RPi). It is also assumed that a command line GDB can connect and debug the RPi through OpenOCD and JTAG. The goal of this article is to transfer all the development flows out of various command line prompts and into the Visual Studio Code IDE for a deeper and more integrated developer experience. While the examples provided are specific to the Appendix A environment referenced above, many of the concepts are similar and can be applied to other remote development environments over a JTAG/SWD interface.
@@ -13,6 +15,7 @@ With all the code now in the workspace we also need to help set up the C/C++ Con
 c:/Source/computersystems/Lab20 Mass Storage/applications/console/*,
 c:/Source/computersystems/Lab20 Mass Storage/**
 ```
+![image intellisense](./images/VisualStudioCode_IntelliSense-Configuration.png)
 
 Be sure to modify them for your code installation directory. The resulting c_cpp_properties.json configuration will look something like this.
 
