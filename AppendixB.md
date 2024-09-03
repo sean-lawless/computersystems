@@ -16,8 +16,6 @@ c:/Source/computersystems/Lab20 Mass Storage/applications/console/*
 c:/Source/computersystems/Lab20 Mass Storage/**
 ```
 
-![image intellisense](./images/VisualStudioCode_IntelliSense-Configuration.png)
-
 Be sure to modify them for your code installation directory. The resulting c_cpp_properties.json configuration will look something like this.
 
 ```json
@@ -60,6 +58,7 @@ With all the code now in the workspace and IntelliSense configured, Visual Studi
 
 Once the Makefile Tools extension is installed, move the new extension to the right pane of the Visual Studio Code so it is always accessible. Select Make and press the pencil icon to edit and add the path to your installed make command (make if in your path, or c:/msys64/usr/bin/make.exe or similar if not). Set the Makefile setting to point to the application makefile (applications/console/Makefile) and the Launch target to console.elf and the Build target to all’ Then press the Makefile: build the current target button and the make command will be initiated in a new Visual Studio Code Terminal window. Any compile errors can be Ctrl-Clicked to open the file in the editor at the line of the error. Another productivity improvement from manually navigating to the line of the error using an editor outside the compile environment.
 
+![image intellisense](./images/VisualStudioCode_IntelliSense-Configuration.png)
 
 With the code editor and build process now integrated, only the debugging flow still requires command line initiation in a terminal window. The next step is to run OpenOCD in a new Terminal window attached to Visual Studio Code. In the bottom middle pane select TERMINAL and press the plus icon for New Terminal and select the console directory to start in. Now, in this terminal run the OpenOCD command for your connection and hardware configuration. Here is an example for Windows development PC using the SiPeed USB to JTAG/UART adapter communicating with a Raspberry Pi version 1. See Appendix A and the Computer Systems book for more information.
 
