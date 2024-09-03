@@ -22,7 +22,15 @@ sudo apt install gdb-multiarch
 sudo apt install openocd
 ```
 
-When debugging on Ubuntu use gdb-multiarch instead of
+For Windows 10/11 with latest MSYS2/Mingw64 the following should install everything from a Mingw64 console.
+
+```bash
+pacman -S mingw-w64-x86_64-arm-none-eabi-gcc
+pacman -S mingw-w64-x86_64-gdb-multiarch
+pacman -S mingw-w64-x86_64-openocd
+```
+
+When debugging on Ubuntu/Windows use gdb-multiarch instead of
 arm-none-eabi-gdb. For example:
 
 ```bash
@@ -88,52 +96,6 @@ References:
 
 [DWelch67 ARM JTAG](https://github.com/dwelch67/raspberrypi/tree/master/armjtag)
 
-### Install MSYS2 and launch the "MSYS2 MinGW 32-bit" shell.
-
-[https://www.msys2.org/](https://www.msys2.org/)
-
-Next we install 'make'. From the launched shell, issue the following
-to install make:
-
-```bash
-pacman -S make
-```
-
-### Install the latest arm-none-eabi toolchain for Windows.
-
-[https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
-
-### Add installed toolchain to the MSYS2 path
-
-Add the directory to the toolchain from #2 to MSYS path.
-
-```bash
-MSYS2_PATH="/usr/local/bin:/usr/bin:/bin:/c/Program Files (x86)/GNU Arm Embedded Toolchain/9 2020-q2-update/bin"
-```
-
-### Install OpenOCD
-
-```bash
-pacman -S mingw-w64-i686-openocd
-```
-
-Unfortunately this version of OpenOCD may be too dated to support the RPi
-hardware. Proceed to the next step to upgrade the OpenOCD.
-
-### Upgrade OpenOCD
-
-To avoid building OpenOCD from scratch, download the latest
-xpack-openocd (xpack-openocd-0.10.0-14-win32-x32.zip)
-
-[https://github.com/xpack-dev-tools/openocd-xpack/releases/](https://github.com/xpack-dev-tools/openocd-xpack/releases/)
-
-Then unzip and copy the 'contrib', 'OpenULINK' and 'scripts' folders to
-c:/msys64/mingw32/share/openocd. Replace/Update any existing files.
-
-Then copy contents of 'bin' folder to c:/msys64/mingw32/bin, again
-replacing any existing files. Alternatively to installing and upgrading
-OpenOCD you can build the latest from Git (not for the faint of heart).
-
 ### Connect all UART and JTAG pins from SiPeed to the RPI.
 
 The UART Rx and Tx connect to the opposite side (Rx to Tx, Tx to Rx).
@@ -162,7 +124,21 @@ By default the FT2232 based SiPeed is configured by Windows to be two
 COM ports. However, it is required to replace the driver for the
 primary UART (A) with WinUSB before OpenOCD can use it for JTAG.
 
-To do this, download, install and execute the Zadig Automated Driver
+To do this, download, install and execute the UsbDriverTool:
+
+[https://visualgdb.com/UsbDriverTool/](https://visualgdb.com/UsbDriverTool/)
+
+Upon execution, the UsbDriverTool Gui will appear, with a list of
+current USB devices on your system. Right click the USB Serial
+Converter A and choose 'Install WinUSB'.
+
+The UsbDriverTool failed with latest Win10 updates when tested on 1/4/2021,
+but the newer version 2.1 works fine with Win11 when tested 08/2024. If it
+does not work for you, try the alternate method below.
+
+[ALTERNATIVE]
+
+To convert driver to WinUSB without UsbDriverTool this, download, install and execute the Zadig Automated Driver
 Installer (v2.5 build 730 tested):
 
 [https://zadig.akeo.ie/](https://zadig.akeo.ie/)
@@ -176,18 +152,6 @@ driver and press the 'Replace Driver' button.
 References
 
 [https://mindchasers.com/dev/openocd-darsena-windows](https://mindchasers.com/dev/openocd-darsena-windows)
-
-[Deprecated]
-
-The UsbDriverTool fails with latest Win10 updates when tested on 1/4/2021.
-
-To do this, download, install and execute the UsbDriverTool:
-
-[https://visualgdb.com/UsbDriverTool/](https://visualgdb.com/UsbDriverTool/)
-
-Upon execution, the UsbDriverTool Gui will appear, with a list of
-current USB devices on your system. Right click the USB Serial
-Converter A and choose 'Install WinUSB'.
 
 ### Execute OpenOCD
 
@@ -211,7 +175,7 @@ book for more details on how to connect GDB to OpenOCD and debug the
 remote RPi target. This chapter (4) is included in the free preview of
 the book (link below).
 
-### Troubleshooting JTAG/OpenOCD on Win10
+### Troubleshooting JTAG/OpenOCD on Win10/11
 
 See the Laboratory, Chapter 4 (free through Leanpub) for more
 information on using OpenOCD. Below is additional information for Win10
@@ -271,4 +235,53 @@ your preferred reading format (PDF recommended for PC reading).
 Computer Systems book preview. Click Read Free Sample and choose
 your preferred reading format (PDF recommended for PC reading).
 [https://leanpub.com/computersystems](https://leanpub.com/computersystems)
+
+## ARCHIVE
+
+### [DEPRECATEWD] Install MSYS2 and launch the "MSYS2 MinGW 32-bit" shell.
+
+[https://www.msys2.org/](https://www.msys2.org/)
+
+Next we install 'make'. From the launched shell, issue the following
+to install make:
+
+```bash
+pacman -S make
+```
+
+### [DEPRECATEWD] Install the latest arm-none-eabi toolchain for Windows.
+
+[https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+
+### [DEPRECATEWD] Add installed toolchain to the MSYS2 path
+
+Add the directory to the toolchain from #2 to MSYS path.
+
+```bash
+MSYS2_PATH="/usr/local/bin:/usr/bin:/bin:/c/Program Files (x86)/GNU Arm Embedded Toolchain/9 2020-q2-update/bin"
+```
+
+### [DEPRECATEWD] Install OpenOCD
+
+```bash
+pacman -S mingw-w64-i686-openocd
+```
+Unfortunately older versions of OpenOCD may be too dated to support the RPi
+hardware. Proceed to the next step to upgrade the OpenOCD.
+
+### [DEPRECATEWD] Upgrade OpenOCD
+
+For the latest OpenOCD (>= 0.12.0) this step is NOT required.
+
+To avoid building OpenOCD from scratch, download the latest
+xpack-openocd (xpack-openocd-0.10.0-14-win32-x32.zip)
+
+[https://github.com/xpack-dev-tools/openocd-xpack/releases/](https://github.com/xpack-dev-tools/openocd-xpack/releases/)
+
+Then unzip and copy the 'contrib', 'OpenULINK' and 'scripts' folders to
+c:/msys64/mingw32/share/openocd. Replace/Update any existing files.
+
+Then copy contents of 'bin' folder to c:/msys64/mingw32/bin, again
+replacing any existing files. Alternatively to installing and upgrading
+OpenOCD you can build the latest from Git (not for the faint of heart).
 
