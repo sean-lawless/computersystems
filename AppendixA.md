@@ -23,6 +23,8 @@ sudo apt install openocd
 ```
 
 For Windows 10/11 with latest MSYS2/Mingw64 the following should install everything from a Mingw64 console.
+To integrate these tools with other command prompts (Appendix B), add c:\msys64\usr\bin and c:\msys64\mingw64\bin
+to your environment variable PATH.
 
 ```bash
 pacman -S mingw-w64-x86_64-arm-none-eabi-gcc
