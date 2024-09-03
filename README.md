@@ -38,3 +38,9 @@ the development PC. This is an alternative to using a Raspbian development
 PC.
 
 [Appendix A: Windows Development PC](AppendixA.md)
+
+## Appendix B
+
+Using Visual Studio Code to set up an Integrated Development Environment for a more integrated bare metal application development experience.
+
+[Appendix B: Visual Studio Code IDE](AppendixB.md)
