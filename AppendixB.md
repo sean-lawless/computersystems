@@ -1,5 +1,5 @@
 
-# Visual Studio Code debugging a bare metal Raspberry Pi application
+# Visual Studio Code IDE for bare metal Raspberry Pi
 
 Long a favorite for web developers, Microsoft Visual Studio Code now has extensions and features to robustly support embedded software development. This article describes how to set up a workspace for rapid development of a bare metal embedded device utilizing JTAG and UART connections between the cross-compiling development PC and a bare metal ARM embedded device, in this example, a Raspberry Pi.
 
